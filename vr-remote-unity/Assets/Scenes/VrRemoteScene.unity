@@ -455,6 +455,7 @@ GameObject:
   - component: {fileID: 974482049}
   - component: {fileID: 974482048}
   - component: {fileID: 974482047}
+  - component: {fileID: 974482051}
   m_Layer: 0
   m_Name: WebRtcPlan
   m_TagString: Untagged
@@ -542,6 +543,17 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 974482045}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &974482051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 974482045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36908bb448f054df89c30d31e9f6d20e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1435927747
 GameObject:
   m_ObjectHideFlags: 0
