@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 534669903}
   m_Layer: 0
   m_Name: Main Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -456,6 +456,7 @@ GameObject:
   - component: {fileID: 974482048}
   - component: {fileID: 974482047}
   - component: {fileID: 974482051}
+  - component: {fileID: 974482052}
   m_Layer: 0
   m_Name: WebRtcPlan
   m_TagString: Untagged
@@ -554,6 +555,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36908bb448f054df89c30d31e9f6d20e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &974482052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 974482045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates: []
+  delegates: []
 --- !u!1 &1435927747
 GameObject:
   m_ObjectHideFlags: 0

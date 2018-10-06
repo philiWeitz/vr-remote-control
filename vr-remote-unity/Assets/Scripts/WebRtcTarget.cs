@@ -14,13 +14,14 @@ public class WebRtcTarget : MonoBehaviour
 
     private Texture2D nativeTexture = null;
 
+    private bool isFlippedHorizontally = false;
+
 
     // Use this for initialization
     void Start()
     {
-        Vector3 scale = this.GetComponent<Renderer>().transform.localScale;
-        scale.x = -scale.x;
-        this.GetComponent<Renderer>().transform.localScale = scale;
+        //FlipComponentVertical();
+        FlipComponentHorizontal();
 
         SetupWebRtcCall();
         //RenderExternalTexture();
@@ -28,10 +29,45 @@ public class WebRtcTarget : MonoBehaviour
     }
 
 
+    private void OnMouseUp()
+    {
+        if(isFlippedHorizontally) {
+            Debug.Log("Flipping vertically");
+            FlipComponentHorizontal();
+            FlipComponentVertical();
+
+        } else {
+            Debug.Log("Flipping horizontally");
+            FlipComponentVertical();
+            FlipComponentHorizontal();
+        }
+    }
+
+
     void Update()
     {
         //RenderExternalTexture();
         RenderExternalAlpha8Texture();
+    }
+
+
+    void FlipComponentVertical()
+    {
+        Vector3 scale = this.GetComponent<Renderer>().transform.localScale;
+        scale.x = -scale.x;
+        this.GetComponent<Renderer>().transform.localScale = scale;
+
+        isFlippedHorizontally = false;
+    }
+
+
+    void FlipComponentHorizontal()
+    {
+        Vector3 scale = this.GetComponent<Renderer>().transform.localScale;
+        scale.z = -scale.z;
+        this.GetComponent<Renderer>().transform.localScale = scale;
+
+        isFlippedHorizontally = true;
     }
 
 
