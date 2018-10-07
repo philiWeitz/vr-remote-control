@@ -6,11 +6,9 @@ using UnityEngine.UI;
 
 public class WebRtcTarget : MonoBehaviour
 {
-    private readonly string pluginClassString = "com.vrremote.PluginClass";
+    private double timeLastExecution = 0;
 
-    private long timeLastExecution = 0;
-
-    private readonly int INTERVAL = 40000;
+    private readonly int INTERVAL_IN_MS = 1;
 
     private Texture2D nativeTexture = null;
 
@@ -25,7 +23,8 @@ public class WebRtcTarget : MonoBehaviour
 
         SetupWebRtcCall();
         //RenderExternalTexture();
-        RenderExternalAlpha8Texture();   
+        //RenderExternalAlpha8Texture();   
+        RenderExternalArgbTexture();
     }
 
 
@@ -47,7 +46,8 @@ public class WebRtcTarget : MonoBehaviour
     void Update()
     {
         //RenderExternalTexture();
-        RenderExternalAlpha8Texture();
+        //RenderExternalAlpha8Texture();
+        RenderExternalArgbTexture();
     }
 
 
@@ -76,7 +76,7 @@ public class WebRtcTarget : MonoBehaviour
         AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
 
         // set the main activity
-        AndroidJavaClass plugin = new AndroidJavaClass(pluginClassString);
+        AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
         plugin.SetStatic<AndroidJavaObject>("mainActivity", activity);
 
         // setup call environment
@@ -88,11 +88,13 @@ public class WebRtcTarget : MonoBehaviour
 
     void RenderExternalTexture()
     {
-        if (timeLastExecution < DateTime.UtcNow.ToFileTimeUtc())
-        {
-            timeLastExecution = DateTime.UtcNow.ToFileTimeUtc() + INTERVAL;
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-            AndroidJavaClass plugin = new AndroidJavaClass(pluginClassString);
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + INTERVAL_IN_MS;
+
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
             AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getTextureResult");
 
             Int32 texPtr = returnedObject.Get<Int32>("texturePtr");
@@ -124,11 +126,13 @@ public class WebRtcTarget : MonoBehaviour
             return;
         }
 
-        if (timeLastExecution < DateTime.UtcNow.ToFileTimeUtc())
-        {
-            timeLastExecution = DateTime.UtcNow.ToFileTimeUtc() + INTERVAL;
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-            AndroidJavaClass plugin = new AndroidJavaClass(pluginClassString);
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + INTERVAL_IN_MS;
+
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
             AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getAlpha8TextureResult");
 
             Int32 texPtr = returnedObject.Get<Int32>("texturePtr");
@@ -146,6 +150,42 @@ public class WebRtcTarget : MonoBehaviour
             {
                 nativeTexture = Texture2D.CreateExternalTexture(
                     width, height, TextureFormat.Alpha8, false, false, (IntPtr)texPtr);
+            }
+
+            this.GetComponent<Renderer>().material.mainTexture = nativeTexture;
+            nativeTexture.UpdateExternalTexture((IntPtr)texPtr);
+        }
+    }
+
+    void RenderExternalArgbTexture()
+    {
+        if (Application.platform != RuntimePlatform.Android)
+        {
+            return;
+        }
+
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + INTERVAL_IN_MS;
+
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+            AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getArgbTextureResult");
+
+            Int32 texPtr = returnedObject.Get<Int32>("texturePtr");
+            Int32 width = returnedObject.Get<Int32>("width");
+            Int32 height = returnedObject.Get<Int32>("height");
+
+            if (width <= 0 || height <= 0 || texPtr <= 0)
+            {
+                return;
+            }
+
+            if (null == nativeTexture || nativeTexture.width != width || nativeTexture.height != height)
+            {
+                nativeTexture = Texture2D.CreateExternalTexture(
+                    width, height, TextureFormat.ARGB32, false, false, (IntPtr)texPtr);
             }
 
             this.GetComponent<Renderer>().material.mainTexture = nativeTexture;

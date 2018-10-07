@@ -79,7 +79,7 @@ public class PluginClass {
 
     // get a test texture pointer modified by a render script
     public static TextureResult getTextureResult() {
-        Log.d(TAG, "Generate texture result");
+        Log.v(TAG, "Generate texture result");
 
         Bitmap bmp = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         bmp.eraseColor(Color.RED);
@@ -91,6 +91,30 @@ public class PluginClass {
         result.texturePtr = texturePointer;
         result.width = bmp.getWidth();
         result.height = bmp.getHeight();
+
+        return result;
+    }
+
+    // get a ARGB texture
+    public static TextureResult getArgbTextureResult() {
+        Log.v(TAG, "Generate ARGB texture");
+
+        TextureResult result = new TextureResult();
+        Bitmap bmp = FrameCallback.instance().getArgbBitmap();
+
+        if(bmp == null) {
+            result.texturePtr = 0;
+            result.width = 0;
+            result.height = 0;
+
+        } else {
+            int texturePointer = bitmapToTexture(bmp);
+            result.texturePtr = texturePointer;
+            result.width = bmp.getWidth();
+            result.height = bmp.getHeight();
+        }
+
+        FrameCallback.instance().setIsNewFrame(false);
 
         return result;
     }
@@ -138,7 +162,7 @@ public class PluginClass {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
-        Log.d(TAG, "Texture id: " + textureHandle[0]);
+        Log.v(TAG, "Texture id: " + textureHandle[0]);
         return textureHandle[0];
     }
 }

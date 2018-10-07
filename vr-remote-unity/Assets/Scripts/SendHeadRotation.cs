@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class SendHeadRotation : MonoBehaviour
 {
-    private readonly string pluginClassString = "com.vrremote.PluginClass";
+    private readonly int INTERVAL_IN_MS = 50;
 
-    private readonly int INTERVAL = 40000;
+    private double timeLastExecution = 0;
 
-    private long timeLastExecution = 0;
+    private Vector3 lastHeadPosition = new Vector3(100,100,100);
+
 
     // Use this for initialization
     void Start()
@@ -20,14 +21,35 @@ public class SendHeadRotation : MonoBehaviour
     private void Update()
     {
         SendHeadRotationToMotionServer();
+        //SendHeadRotationToMotionServerMock();
+    }
+
+
+    private void OnDestroy()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+
+            string json = JsonUtility.ToJson(HeadRotation.fromVector3(new Vector3(0, 0, 0)));
+            plugin.CallStatic("sendMessageToMotionWebSocket", json);
+        }
     }
 
 
     void ConnectToMotionServer() {
-        AndroidJavaClass plugin = new AndroidJavaClass(pluginClassString);
+        AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
 
-        plugin.CallStatic("setWebSocketUrl", "ws://vr-remote-control-ws-server.herokuapp.com");
+        plugin.CallStatic("setWebSocketUrl", Config.WEB_SOCKET_SERVER_URL);
         plugin.CallStatic("connectToMotionWebSocket");
+    }
+
+
+    bool HeadPositionHasChanged(Vector3 currentHeadPosition) {
+        Vector3 sub = currentHeadPosition - lastHeadPosition;
+        float sum = Mathf.Abs(sub.x) + Mathf.Abs(sub.y) + Mathf.Abs(sub.z);
+
+        return (sum >= 1);
     }
 
 
@@ -38,18 +60,45 @@ public class SendHeadRotation : MonoBehaviour
             return;
         }
 
-        if (timeLastExecution < DateTime.UtcNow.ToFileTimeUtc())
-        {
-            timeLastExecution = DateTime.UtcNow.ToFileTimeUtc() + INTERVAL;
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-            AndroidJavaClass plugin = new AndroidJavaClass(pluginClassString);
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + INTERVAL_IN_MS;
 
             // get camera rotation
-            Vector3 rotation = Camera.main.gameObject.transform.rotation.eulerAngles;
+            Vector3 currentHeadPosition = Camera.main.gameObject.transform.rotation.eulerAngles;
 
-            string json = JsonUtility.ToJson(HeadRotation.fromVector3(rotation));
-            plugin.CallStatic("sendMessageToMotionWebSocket", json);
+            if (HeadPositionHasChanged(currentHeadPosition))
+            {
+                lastHeadPosition = currentHeadPosition;
+
+                string json = JsonUtility.ToJson(HeadRotation.fromVector3(currentHeadPosition));
+
+                AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+                plugin.CallStatic("sendMessageToMotionWebSocket", json);
+            }
         }
     }
 
+
+    void SendHeadRotationToMotionServerMock()
+    {
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + INTERVAL_IN_MS;
+
+            // get camera rotation
+            Vector3 currentHeadPosition = Camera.main.gameObject.transform.rotation.eulerAngles;
+
+            if(HeadPositionHasChanged(currentHeadPosition)) {
+                lastHeadPosition = currentHeadPosition;
+                string json = JsonUtility.ToJson(HeadRotation.fromVector3(currentHeadPosition));
+                Debug.Log(json);
+            }
+            Debug.Log("Position is the same");
+        }
+    }
 }

@@ -34,3 +34,8 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+Config.cs
+Config.cs.meta
+remote-android-debug.aar
+remote-android-debug.aar.meta

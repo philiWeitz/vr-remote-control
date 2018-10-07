@@ -61,11 +61,12 @@ public class MainActivity extends Activity {
         public void run() {
             PluginClass.sendMessageToMotionWebSocket("Hello World!!");
 
-            Bitmap bitmap = FrameCallback.instance().getAlpha8Bitmap();
+            //Bitmap bitmap = FrameCallback.instance().getAlpha8Bitmap();
+            Bitmap bitmap = FrameCallback.instance().getArgbBitmap();
 
             if (null != bitmap) {
                 mImageView.setImageBitmap(bitmap);
-                mImageView.setColorFilter(mColorFilter);
+                //mImageView.setColorFilter(mColorFilter);
             }
 
             handler.postDelayed(repeatedTask, 50);
