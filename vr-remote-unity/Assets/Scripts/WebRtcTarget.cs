@@ -6,9 +6,15 @@ using UnityEngine.UI;
 
 public class WebRtcTarget : MonoBehaviour
 {
-    private double timeLastExecution = 0;
+    public int INTERVAL_IN_MS = 1;
 
-    private readonly int INTERVAL_IN_MS = 1;
+    public Int32 Width = 0; // 1024;
+
+    public Int32 Height = 0; // 768;
+
+    public Int32 FramesPerSecond = 0; // 30;
+
+    private double timeLastExecution = 0;
 
     private Texture2D nativeTexture = null;
 
@@ -51,6 +57,16 @@ public class WebRtcTarget : MonoBehaviour
     }
 
 
+    private void OnApplicationPause(bool pause)
+    {
+        if (Application.platform == RuntimePlatform.Android && pause == true)
+        {
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+            plugin.CallStatic("closeWebRtcConnection");
+        }
+    }
+
+
     void FlipComponentVertical()
     {
         Vector3 scale = this.GetComponent<Renderer>().transform.localScale;
@@ -79,8 +95,10 @@ public class WebRtcTarget : MonoBehaviour
         AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
         plugin.SetStatic<AndroidJavaObject>("mainActivity", activity);
 
+        object[] webRtcParam = new object[3] { Width, Height, FramesPerSecond };
+
         // setup call environment
-        plugin.CallStatic("setupCallView");
+        plugin.CallStatic("setupCallView", webRtcParam);
         // start the call
         plugin.CallStatic("startCallView");
     }

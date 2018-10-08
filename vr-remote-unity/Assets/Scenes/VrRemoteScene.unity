@@ -488,6 +488,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b64c897bd559499baaf711d6e184a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  INTERVAL_IN_MS: 1
+  Width: 0
+  Height: 0
+  FramesPerSecond: 0
 --- !u!64 &974482048
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -555,6 +559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36908bb448f054df89c30d31e9f6d20e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  INTERVAL_IN_MS: 50
 --- !u!114 &974482052
 MonoBehaviour:
   m_ObjectHideFlags: 0

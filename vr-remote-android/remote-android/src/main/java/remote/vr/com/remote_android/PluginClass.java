@@ -32,12 +32,12 @@ public class PluginClass {
         return "Android " + number + " - " + (mainActivity != null);
     }
 
-    public static void setupCallView() {
+    public static void setupCallView(int width, int height, int fps) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "Setup Call View...");
-                CallView.instance().onCreate(mainActivity);
+                CallView.instance().onCreate(mainActivity, width, height, fps);
             }
         });
     }
@@ -141,6 +141,13 @@ public class PluginClass {
         FrameCallback.instance().setIsNewFrame(false);
 
         return result;
+    }
+
+    // Closes the Web RTC connection and cleans up all resources
+    public static void closeWebRtcConnection() {
+        CallView.instance().stop();
+        CallView.instance().destroy();
+        Log.i(TAG, "Closed Web RTC connection and cleaned up all resources");
     }
 
     // write bitmap to texture

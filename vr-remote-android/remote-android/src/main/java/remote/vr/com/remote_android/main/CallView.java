@@ -39,6 +39,10 @@ public class CallView {
     private PeerConnectionClient mPeerConnectionClient = null;
     private PeerConnectionEvents mPeerConnectionEvents = null;
 
+    private int mVideoWidth = 0;
+    private int mVideoHeight = 0;
+    private int mVideoFps = 0;
+
 
     public void start() {
         if (mPeerConnectionClient != null) {
@@ -59,8 +63,12 @@ public class CallView {
     }
 
 
-    public void onCreate(Activity activity) {
+    public void onCreate(Activity activity, int width, int height, int fps) {
         this.mActivity = activity;
+
+        mVideoWidth = width;
+        mVideoHeight = height;
+        mVideoFps = fps;
 
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) activity
                 .findViewById(android.R.id.content)).getChildAt(0);
@@ -73,7 +81,7 @@ public class CallView {
         textView.setTextColor(Color.GREEN);
 
         mPeerConnectionClient = new PeerConnectionClient();
-        mSignalingEvents = new SignalingEvents(mPeerConnectionClient);
+        mSignalingEvents = new SignalingEvents(mPeerConnectionClient, mActivity);
 
         // generate a random room string
         String roomId = UUID.randomUUID().toString().toLowerCase().substring(0, 7);
@@ -90,7 +98,7 @@ public class CallView {
         mPeerConnectionEvents = new PeerConnectionEvents(mAppRtcClient);
 
         mPeerConnectionClient.createPeerConnectionFactory(
-                mActivity.getApplicationContext(), mPeerConnectionParameters, mPeerConnectionEvents);
+                mActivity.getApplicationContext(), getPeerParameter(), mPeerConnectionEvents);
 
         Uri roomUri = Uri.parse(APP_RTC_URL);
 
@@ -117,26 +125,27 @@ public class CallView {
     }
 
 
-    private PeerConnectionClient.PeerConnectionParameters mPeerConnectionParameters =
-            new PeerConnectionClient.PeerConnectionParameters(true,
-                    false,
-                    false,
-                    640,
-                    480,
-                    0,
-                    1700,
-                    "VP8",
-                    false,
-                    false,
-                    32,
-                    "OPUS",
-                    true,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    null);
+    private PeerConnectionClient.PeerConnectionParameters getPeerParameter() {
+        return new PeerConnectionClient.PeerConnectionParameters(true,
+                false,
+                false,
+                mVideoWidth,
+                mVideoHeight,
+                mVideoFps,
+                1700,
+                "VP8",
+                false,
+                false,
+                32,
+                "OPUS",
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                null);
+    }
 }

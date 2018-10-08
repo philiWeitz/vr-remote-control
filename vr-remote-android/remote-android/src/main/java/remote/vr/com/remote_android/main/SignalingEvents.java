@@ -1,6 +1,8 @@
 package remote.vr.com.remote_android.main;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
@@ -16,10 +18,12 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
 
     private static final String TAG = "VR-REMOTE";
 
+    private Activity mActivity;
     private PeerConnectionClient mPeerConnectionClient;
 
 
-    public SignalingEvents(PeerConnectionClient peerConnectionClient) {
+    public SignalingEvents(PeerConnectionClient peerConnectionClient, Activity activity) {
+        this.mActivity = activity;
         this.mPeerConnectionClient = peerConnectionClient;
     }
 
@@ -70,6 +74,12 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
     @Override
     public void onChannelError(String description) {
         Log.e(TAG, "Signalling channel error: " + description);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mActivity, "Error: " + description, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private VideoRenderer.Callbacks mVideoRendererCallbacks = new VideoRenderer.Callbacks() {

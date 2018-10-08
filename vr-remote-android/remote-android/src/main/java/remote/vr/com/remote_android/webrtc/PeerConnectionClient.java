@@ -73,7 +73,7 @@ public class PeerConnectionClient {
   public static final String VIDEO_TRACK_ID = "ARDAMSv0";
   public static final String AUDIO_TRACK_ID = "ARDAMSa0";
   public static final String VIDEO_TRACK_TYPE = "video";
-  private static final String TAG = "PCRTCClient";
+  private static final String TAG = "VR-REMOTE";
   private static final String VIDEO_CODEC_VP8 = "VP8";
   private static final String VIDEO_CODEC_VP9 = "VP9";
   public static final String VIDEO_CODEC_H264 = "H264";
@@ -539,24 +539,6 @@ public class PeerConnectionClient {
       Log.w(TAG, "No camera on device. Switch to audio only call.");
       videoCallEnabled = false;
     }
-    // Create video constraints if video call is enabled.
-    if (videoCallEnabled) {
-      videoWidth = peerConnectionParameters.videoWidth;
-      videoHeight = peerConnectionParameters.videoHeight;
-      videoFps = peerConnectionParameters.videoFps;
-
-      // If video resolution is not specified, default to HD.
-      if (videoWidth == 0 || videoHeight == 0) {
-        videoWidth = HD_VIDEO_WIDTH;
-        videoHeight = HD_VIDEO_HEIGHT;
-      }
-
-      // If fps is not specified, default to 30.
-      if (videoFps == 0) {
-        videoFps = 30;
-      }
-      Logging.d(TAG, "Capturing format: " + videoWidth + "x" + videoHeight + "@" + videoFps);
-    }
 
     // Create audio constraints.
     audioConstraints = new MediaConstraints();
@@ -579,17 +561,41 @@ public class PeerConnectionClient {
     }
     // Create SDP constraints.
     sdpMediaConstraints = new MediaConstraints();
-    sdpMediaConstraints.mandatory.add(
+    sdpMediaConstraints.optional.add(
         new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+
     sdpMediaConstraints.mandatory.add(
         new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
+
+    if(videoFps > 0) {
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("minFrameRate", "" + videoFps));
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("maxFrameRate", "" + videoFps));
+      Log.d(TAG, "Added media constraint FPS: " + videoFps);
+    }
+
+    if(videoWidth > 0) {
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("maxWidth", "" + videoWidth));
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("minWidth", "" + videoWidth));
+      Log.d(TAG, "Added media constraint Width: " + videoWidth);
+    }
+
+    if(videoHeight > 0) {
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("maxHeight", "" + videoHeight));
+      sdpMediaConstraints.mandatory.add(
+              new MediaConstraints.KeyValuePair("minHeight", "" + videoHeight));
+      Log.d(TAG, "Added media constraint Height: " + videoHeight);
+    }
+
     if (videoCallEnabled || peerConnectionParameters.loopback) {
       sdpMediaConstraints.mandatory.add(
           new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-    } else {
-      sdpMediaConstraints.mandatory.add(
-          new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "false"));
     }
+
   }
 
   private void createPeerConnectionInternal() {

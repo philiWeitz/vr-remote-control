@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SendHeadRotation : MonoBehaviour
 {
-    private readonly int INTERVAL_IN_MS = 50;
+    public int INTERVAL_IN_MS = 50;
 
     private double timeLastExecution = 0;
 
@@ -25,9 +25,9 @@ public class SendHeadRotation : MonoBehaviour
     }
 
 
-    private void OnDestroy()
+    private void OnApplicationPause(bool pause)
     {
-        if (Application.platform == RuntimePlatform.Android)
+        if (Application.platform == RuntimePlatform.Android && pause == true)
         {
             AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
 

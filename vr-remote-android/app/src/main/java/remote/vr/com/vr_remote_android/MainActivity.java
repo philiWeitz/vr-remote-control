@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
         super.onStart();
 
         PluginClass.mainActivity = this;
-        PluginClass.setupCallView();
+        PluginClass.setupCallView(0,0,0);
         PluginClass.startCallView();
         PluginClass.connectToMotionWebSocket();
 
@@ -40,13 +40,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         CallView.instance().stop();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
         CallView.instance().destroy();
-        super.onDestroy();
+
+        super.onStop();
     }
 
     ColorMatrixColorFilter mColorFilter = new ColorMatrixColorFilter(new float[]{
