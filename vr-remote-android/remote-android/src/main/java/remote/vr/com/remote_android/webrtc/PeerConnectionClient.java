@@ -321,6 +321,9 @@ public class PeerConnectionClient {
     enableAudio = true;
     localAudioTrack = null;
     statsTimer = new Timer();
+    videoWidth = peerConnectionParameters.videoWidth;
+    videoHeight = peerConnectionParameters.videoHeight;
+    videoFps = peerConnectionParameters.videoFps;
 
     executor.execute(new Runnable() {
       @Override
@@ -567,29 +570,29 @@ public class PeerConnectionClient {
     sdpMediaConstraints.mandatory.add(
         new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
 
-    if(videoFps > 0) {
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("minFrameRate", "" + videoFps));
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("maxFrameRate", "" + videoFps));
-      Log.d(TAG, "Added media constraint FPS: " + videoFps);
-    }
-
-    if(videoWidth > 0) {
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("maxWidth", "" + videoWidth));
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("minWidth", "" + videoWidth));
-      Log.d(TAG, "Added media constraint Width: " + videoWidth);
-    }
-
-    if(videoHeight > 0) {
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("maxHeight", "" + videoHeight));
-      sdpMediaConstraints.mandatory.add(
-              new MediaConstraints.KeyValuePair("minHeight", "" + videoHeight));
-      Log.d(TAG, "Added media constraint Height: " + videoHeight);
-    }
+//    if(videoFps > 0) {
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("minFrameRate", "" + videoFps));
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("maxFrameRate", "" + videoFps));
+//      Log.d(TAG, "Added media constraint FPS: " + videoFps);
+//    }
+//
+//    if(videoWidth > 0) {
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("maxWidth", "" + videoWidth));
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("minWidth", "" + videoWidth));
+//      Log.d(TAG, "Added media constraint Width: " + videoWidth);
+//    }
+//
+//    if(videoHeight > 0) {
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("maxHeight", "" + videoHeight));
+//      sdpMediaConstraints.mandatory.add(
+//              new MediaConstraints.KeyValuePair("minHeight", "" + videoHeight));
+//      Log.d(TAG, "Added media constraint Height: " + videoHeight);
+//    }
 
     if (videoCallEnabled || peerConnectionParameters.loopback) {
       sdpMediaConstraints.mandatory.add(
@@ -1316,9 +1319,9 @@ public class PeerConnectionClient {
       if (preferIsac) {
         sdpDescription = preferCodec(sdpDescription, AUDIO_CODEC_ISAC, true);
       }
-      if (videoCallEnabled) {
-        sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
-      }
+
+      sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
+
       final SessionDescription sdp = new SessionDescription(origSdp.type, sdpDescription);
       localSdp = sdp;
       executor.execute(new Runnable() {

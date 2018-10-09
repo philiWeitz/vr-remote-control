@@ -63,7 +63,7 @@ public class CallView {
     }
 
 
-    public void onCreate(Activity activity, int width, int height, int fps) {
+    public void onCreate(Activity activity, int width, int height, int fps, String roomId) {
         this.mActivity = activity;
 
         mVideoWidth = width;
@@ -83,12 +83,17 @@ public class CallView {
         mPeerConnectionClient = new PeerConnectionClient();
         mSignalingEvents = new SignalingEvents(mPeerConnectionClient, mActivity);
 
-        // generate a random room string
-        String roomId = UUID.randomUUID().toString().toLowerCase().substring(0, 7);
-        textView.setText(roomId);
-        Log.d(TAG, "Room ID: " + roomId);
+        String webRtcRoomId = roomId;
 
-        connectToRoom(roomId);
+        // take the room id or generate a random room string
+        if(webRtcRoomId == null || webRtcRoomId.isEmpty()) {
+            webRtcRoomId = UUID.randomUUID().toString().toLowerCase().substring(0, 7);
+        }
+
+        textView.setText(webRtcRoomId);
+        Log.d(TAG, "Room ID: " + webRtcRoomId);
+
+        connectToRoom(webRtcRoomId);
     }
 
 

@@ -32,12 +32,13 @@ public class PluginClass {
         return "Android " + number + " - " + (mainActivity != null);
     }
 
-    public static void setupCallView(int width, int height, int fps) {
+    public static void setupCallView(int width, int height, int fps, String roomId) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Setup Call View...");
-                CallView.instance().onCreate(mainActivity, width, height, fps);
+                Log.d(TAG, "Setup Call View... (width: " + width +
+                    ", height: " + height + ", FPS:" + fps + ", roomId: " + roomId);
+                CallView.instance().onCreate(mainActivity, width, height, fps, roomId);
             }
         });
     }
