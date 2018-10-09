@@ -74,8 +74,8 @@ public class PeerConnectionClient {
   public static final String AUDIO_TRACK_ID = "ARDAMSa0";
   public static final String VIDEO_TRACK_TYPE = "video";
   private static final String TAG = "VR-REMOTE";
-  private static final String VIDEO_CODEC_VP8 = "VP8";
-  private static final String VIDEO_CODEC_VP9 = "VP9";
+  public static final String VIDEO_CODEC_VP8 = "VP8";
+  public static final String VIDEO_CODEC_VP9 = "VP9";
   public static final String VIDEO_CODEC_H264 = "H264";
   public static final String VIDEO_CODEC_H264_BASELINE = "H264 Baseline";
   private static final String VIDEO_CODEC_H264_HIGH = "H264 High";
@@ -569,30 +569,6 @@ public class PeerConnectionClient {
 
     sdpMediaConstraints.mandatory.add(
         new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-
-//    if(videoFps > 0) {
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("minFrameRate", "" + videoFps));
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("maxFrameRate", "" + videoFps));
-//      Log.d(TAG, "Added media constraint FPS: " + videoFps);
-//    }
-//
-//    if(videoWidth > 0) {
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("maxWidth", "" + videoWidth));
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("minWidth", "" + videoWidth));
-//      Log.d(TAG, "Added media constraint Width: " + videoWidth);
-//    }
-//
-//    if(videoHeight > 0) {
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("maxHeight", "" + videoHeight));
-//      sdpMediaConstraints.mandatory.add(
-//              new MediaConstraints.KeyValuePair("minHeight", "" + videoHeight));
-//      Log.d(TAG, "Added media constraint Height: " + videoHeight);
-//    }
 
     if (videoCallEnabled || peerConnectionParameters.loopback) {
       sdpMediaConstraints.mandatory.add(

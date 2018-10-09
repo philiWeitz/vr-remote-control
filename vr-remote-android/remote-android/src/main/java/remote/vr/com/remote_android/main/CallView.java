@@ -39,10 +39,6 @@ public class CallView {
     private PeerConnectionClient mPeerConnectionClient = null;
     private PeerConnectionEvents mPeerConnectionEvents = null;
 
-    private int mVideoWidth = 0;
-    private int mVideoHeight = 0;
-    private int mVideoFps = 0;
-
 
     public void start() {
         if (mPeerConnectionClient != null) {
@@ -63,12 +59,8 @@ public class CallView {
     }
 
 
-    public void onCreate(Activity activity, int width, int height, int fps, String roomId) {
+    public void onCreate(Activity activity, String roomId) {
         this.mActivity = activity;
-
-        mVideoWidth = width;
-        mVideoHeight = height;
-        mVideoFps = fps;
 
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) activity
                 .findViewById(android.R.id.content)).getChildAt(0);
@@ -134,11 +126,11 @@ public class CallView {
         return new PeerConnectionClient.PeerConnectionParameters(true,
                 false,
                 false,
-                mVideoWidth,
-                mVideoHeight,
-                mVideoFps,
+                0,
+                0,
+                0,
                 1700,
-                "VP8",
+                PeerConnectionClient.VIDEO_CODEC_VP8,
                 false,
                 false,
                 32,
