@@ -8,11 +8,8 @@ public class WebRtcTarget : MonoBehaviour
 {
     public int INTERVAL_IN_MS = 1;
 
-    public Int32 Width = 0; // 1024;
+    public String RoomId = "";
 
-    public Int32 Height = 0; // 768;
-
-    public Int32 FramesPerSecond = 0; // 30;
 
     private double timeLastExecution = 0;
 
@@ -95,7 +92,7 @@ public class WebRtcTarget : MonoBehaviour
         AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
         plugin.SetStatic<AndroidJavaObject>("mainActivity", activity);
 
-        object[] webRtcParam = new object[3] { Width, Height, FramesPerSecond };
+        object[] webRtcParam = new object[1] { RoomId };
 
         // setup call environment
         plugin.CallStatic("setupCallView", webRtcParam);
