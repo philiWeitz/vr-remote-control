@@ -1,15 +1,10 @@
 import { GPIO } from '../enum/GpioPin';
 
 
-const MAX_PWM_VALUE = 100;
+export const MAX_PWM_VALUE = 100;
 
 function limitPwmValue(pulseWidth: number): number {
   return Math.max(0, Math.min(MAX_PWM_VALUE, pulseWidth));
-}
-
-export function setPWMDecimalPercentage(decimalPercentage: number, gpioPin: GPIO) {
-  const pwmValue = MAX_PWM_VALUE * decimalPercentage;
-  setPWM(pwmValue, gpioPin);
 }
 
 
