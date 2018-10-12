@@ -25,9 +25,9 @@ wsServer.on('connection', (ws: WebSocket) => {
       subscriptions.forEach((subscriber) => {
         subscriber.send(message.toString());
       });
-    } catch(e) {
+    } catch (e) {
       subscriptions = subscriptions.filter(
-        (subscriber) => subscriber.readyState === 1);
+        subscriber => subscriber.readyState === 1);
     }
   });
 
@@ -35,7 +35,7 @@ wsServer.on('connection', (ws: WebSocket) => {
 });
 
 
-//start the server
+// start the server
 server.listen(config.WS_SERVER_PORT, () => {
   console.log(`Server started on port ${config.WS_SERVER_PORT}`);
 });

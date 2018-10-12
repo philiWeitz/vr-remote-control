@@ -1,5 +1,5 @@
 
 export interface HeadPosition {
-  vertical: number,
+  vertical: number;
   horizontal: number;
 }
