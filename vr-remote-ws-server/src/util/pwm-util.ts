@@ -41,7 +41,7 @@ export function setPWM(pulseWidth: number, gpioPin: GPIO) {
   const pin = pinMap[gpioPin];
   if (pin) {
     const pwmValueLimited = limitPwmValue(pulseWidth);
-    pin.servoWrite(pwmValueLimited);
+    pin.pwmWrite(pwmValueLimited);
   }
 }
 */

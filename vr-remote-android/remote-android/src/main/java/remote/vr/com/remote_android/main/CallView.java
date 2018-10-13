@@ -123,6 +123,16 @@ public class CallView {
 
 
     private PeerConnectionClient.PeerConnectionParameters getPeerParameter() {
+        PeerConnectionClient.DataChannelParameters dataChannelParameters =
+            new PeerConnectionClient.DataChannelParameters(
+                true,
+                -1,
+                -1,
+                "",
+                false,
+                -1
+        );
+
         return new PeerConnectionClient.PeerConnectionParameters(true,
                 false,
                 false,
@@ -143,6 +153,6 @@ public class CallView {
                 false,
                 false,
                 false,
-                null);
+                dataChannelParameters);
     }
 }
