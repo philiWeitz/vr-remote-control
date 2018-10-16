@@ -67,7 +67,7 @@ class WebRtcComponent extends React.Component {
 
   disconnectFromRoom = (params) => {
     if (!params) {
-      return;
+      return Promise.resolve();
     }
 
     const { clientId, roomId } = params;
@@ -81,7 +81,7 @@ class WebRtcComponent extends React.Component {
         this.setState({errorMessage: error.toString()});
       });
     }
-    return Promise.resolve();
+    return Promise.reject();
   };
 
 
