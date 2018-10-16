@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
         super.onStart();
 
         PluginClass.mainActivity = this;
-        PluginClass.setupCallView("dwejfnweijfn32xx2");
+        PluginClass.setupCallView("123456789abcd");
         PluginClass.startCallView();
         PluginClass.connectToMotionWebSocket();
 
@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
     private Runnable repeatedTask = new Runnable() {
         @Override
         public void run() {
-            PluginClass.sendMessageToMotionWebSocket("Hello World!!");
+            //PluginClass.sendMessageToMotionWebSocket("Ping Pong From Android");
 
             //Bitmap bitmap = FrameCallback.instance().getAlpha8Bitmap();
             Bitmap bitmap = FrameCallback.instance().getArgbBitmap();
