@@ -374,6 +374,18 @@ public class PeerConnectionClient {
     });
   }
 
+  public void sendDataByChannel(String message) {
+    if(dataChannelEnabled && dataChannel != null) {
+      try {
+        DataChannel.Buffer buffer = new DataChannel.Buffer(
+                ByteBuffer.wrap(message.getBytes()), false);
+        dataChannel.send(buffer);
+      } catch(Exception e) {
+        Log.e(TAG, "Error data channel: ", e);
+      }
+    }
+  }
+
   public boolean isVideoCallEnabled() {
     return videoCallEnabled;
   }
@@ -608,7 +620,7 @@ public class PeerConnectionClient {
     MediaConstraints mediaConstraints = new MediaConstraints();
     peerConnection = factory.createPeerConnection(rtcConfig, mediaConstraints, pcObserver);
 
-    if (dataChannelEnabled) {
+    /*if (dataChannelEnabled) {
       DataChannel.Init init = new DataChannel.Init();
       init.ordered = peerConnectionParameters.dataChannelParameters.ordered;
       init.negotiated = peerConnectionParameters.dataChannelParameters.negotiated;
@@ -617,7 +629,7 @@ public class PeerConnectionClient {
       init.id = peerConnectionParameters.dataChannelParameters.id;
       init.protocol = peerConnectionParameters.dataChannelParameters.protocol;
       dataChannel = peerConnection.createDataChannel("ApprtcDemo data", init);
-    }
+    }*/
     isInitiator = false;
 
     // Set INFO libjingle logging.
@@ -658,7 +670,7 @@ public class PeerConnectionClient {
     Log.d(TAG, "Closing peer connection.");
     statsTimer.cancel();
     if (dataChannel != null) {
-      dataChannel.dispose();
+      //dataChannel.dispose();
       dataChannel = null;
     }
     if (peerConnection != null) {
@@ -1245,6 +1257,8 @@ public class PeerConnectionClient {
 
       if (!dataChannelEnabled)
         return;
+
+      dataChannel = dc;
 
       dc.registerObserver(new DataChannel.Observer() {
         @Override

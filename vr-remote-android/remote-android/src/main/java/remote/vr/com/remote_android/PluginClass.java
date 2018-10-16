@@ -9,7 +9,6 @@ import android.util.Log;
 
 import remote.vr.com.remote_android.main.CallView;
 import remote.vr.com.remote_android.main.FrameCallback;
-import remote.vr.com.remote_android.main.MotionWebSocketClient;
 
 
 public class PluginClass {
@@ -53,17 +52,18 @@ public class PluginClass {
     }
 
     public static void connectToMotionWebSocket() {
-        MotionWebSocketClient.instance().setActivity(mainActivity);
-        MotionWebSocketClient.instance().start();
+        //MotionWebSocketClient.instance().setActivity(mainActivity);
+        //MotionWebSocketClient.instance().start();
     }
 
     public static void sendMessageToMotionWebSocket(String message) {
-        MotionWebSocketClient.instance().sendMessage(message);
+        CallView.instance().sendMessage(message);
+        //MotionWebSocketClient.instance().sendMessage(message);
     }
 
 
     public static void setWebSocketUrl(String url) {
-        MotionWebSocketClient.instance().setWebSocketUrl(url);
+        //MotionWebSocketClient.instance().setWebSocketUrl(url);
     }
 
     // get a test texture pointer

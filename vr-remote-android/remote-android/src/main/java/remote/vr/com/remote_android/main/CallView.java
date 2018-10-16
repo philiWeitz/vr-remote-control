@@ -59,6 +59,12 @@ public class CallView {
     }
 
 
+    public void sendMessage(String msg) {
+        if (mPeerConnectionClient != null) {
+            mPeerConnectionClient.sendDataByChannel(msg);
+        }
+    }
+
     public void onCreate(Activity activity, String roomId) {
         this.mActivity = activity;
 
