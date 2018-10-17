@@ -10,6 +10,7 @@
 
 package remote.vr.com.remote_android.webrtc;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -54,10 +55,13 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
   private RoomConnectionParameters connectionParameters;
   private String messageUrl;
   private String leaveUrl;
+  private Context mCtx;
 
-  public WebSocketRTCClient(SignalingEvents events) {
+
+  public WebSocketRTCClient(SignalingEvents events, Context ctx) {
     this.events = events;
     roomState = ConnectionState.NEW;
+    this.mCtx = ctx;
     final HandlerThread handlerThread = new HandlerThread(TAG);
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
@@ -94,7 +98,7 @@ public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents 
     String connectionUrl = getConnectionUrl(connectionParameters);
     Log.d(TAG, "Connect to room: " + connectionUrl);
     roomState = ConnectionState.NEW;
-    wsClient = new WebSocketChannelClient(handler, this);
+    wsClient = new WebSocketChannelClient(handler, this, mCtx);
 
     RoomParametersFetcherEvents callbacks = new RoomParametersFetcherEvents() {
       @Override

@@ -10,6 +10,7 @@
 
 package remote.vr.com.remote_android.webrtc;
 
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
@@ -24,6 +25,7 @@ import java.util.List;
 import de.tavendo.autobahn.WebSocket.WebSocketConnectionObserver;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
+import remote.vr.com.remote_android.main.SharedPreferencesUtil;
 import remote.vr.com.remote_android.util.AsyncHttpURLConnection;
 import remote.vr.com.remote_android.util.AsyncHttpURLConnection.AsyncHttpEvents;
 
@@ -53,6 +55,7 @@ public class WebSocketChannelClient {
     // WebSocket send queue. Messages are added to the queue when WebSocket
     // client is not registered and are consumed in register() call.
     private final List<String> wsSendQueue = new ArrayList<>();
+    private Context mCtx;
 
     /**
      * Possible WebSocket connection states.
@@ -73,12 +76,13 @@ public class WebSocketChannelClient {
         void onWebSocketError(final String description);
     }
 
-    public WebSocketChannelClient(Handler handler, WebSocketChannelEvents events) {
+    public WebSocketChannelClient(Handler handler, WebSocketChannelEvents events, Context ctx) {
         this.handler = handler;
         this.events = events;
         roomID = null;
         clientID = null;
         state = WebSocketConnectionState.NEW;
+        this.mCtx = ctx;
     }
 
     public WebSocketConnectionState getState() {
@@ -108,6 +112,9 @@ public class WebSocketChannelClient {
     }
 
     public void register(final String roomID, final String clientID) {
+        SharedPreferencesUtil.setPreference(mCtx, SharedPreferencesUtil.KEY_ROOM_ID, roomID);
+        SharedPreferencesUtil.setPreference(mCtx, SharedPreferencesUtil.KEY_CLIENT_ID, clientID);
+
         checkIfCalledOnValidThread();
         this.roomID = roomID;
         this.clientID = clientID;

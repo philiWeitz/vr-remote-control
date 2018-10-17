@@ -1,6 +1,7 @@
 package remote.vr.com.remote_android.main;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.UUID;
 
+import remote.vr.com.remote_android.util.AsyncHttpURLConnection;
 import remote.vr.com.remote_android.webrtc.AppRTCClient;
 import remote.vr.com.remote_android.webrtc.PeerConnectionClient;
 import remote.vr.com.remote_android.webrtc.WebSocketRTCClient;
@@ -65,8 +67,38 @@ public class CallView {
         }
     }
 
+
+    public void leaveLastRoom(Context ctx) {
+        String lastRoomId = SharedPreferencesUtil.getPreference(
+                ctx, SharedPreferencesUtil.KEY_ROOM_ID);
+        String lastClientId = SharedPreferencesUtil.getPreference(
+                ctx, SharedPreferencesUtil.KEY_CLIENT_ID);
+
+        String postURL = "https://appr.tc/leave/" + lastRoomId + "/" + lastClientId;
+
+        if(lastRoomId != null && lastClientId != null) {
+            AsyncHttpURLConnection httpConnection =
+                    new AsyncHttpURLConnection("POST", postURL, "", new AsyncHttpURLConnection.AsyncHttpEvents() {
+                        @Override
+                        public void onHttpError(String e) {
+                            Log.e(TAG, "Error while leaving last room: " + e);
+                        }
+
+                        @Override
+                        public void onHttpComplete(String response) {
+                            Log.d(TAG, "Left previous room");
+                        }
+                    });
+            httpConnection.send();
+        }
+    }
+
+
     public void onCreate(Activity activity, String roomId) {
         this.mActivity = activity;
+
+        // leave the previous room before starting a new connection
+        leaveLastRoom(activity);
 
         final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) activity
                 .findViewById(android.R.id.content)).getChildAt(0);
@@ -97,7 +129,7 @@ public class CallView {
 
     private void connectToRoom(String roomId) {
         // create the RTC client
-        mAppRtcClient = new WebSocketRTCClient(mSignalingEvents);
+        mAppRtcClient = new WebSocketRTCClient(mSignalingEvents, mActivity);
         mPeerConnectionEvents = new PeerConnectionEvents(mAppRtcClient);
 
         mPeerConnectionClient.createPeerConnectionFactory(
