@@ -1,27 +1,29 @@
 
-let wss = null;
+class WebRtcWebSocketClient {
 
-
-const webSocketUtil = {
-
-  init: (url) => {
-    webSocketUtil.close();
-    wss = new WebSocket(url);
-    console.log('WebRTC websocket opened')
-  },
-
-  close: () => {
-    if (wss) {
-      wss.close(1000, 'remote closed');
-      wss = null;
-      console.log('WebRTC websocket closed')
-    }
-  },
-
-  getWebSocket: () => {
-    return wss;
+  constructor() {
+    this.wss = null;
   }
 
-};
+  init(url) {
+    this.close();
+    this.wss = new WebSocket(url);
 
-export default webSocketUtil;
+    console.log('WebRTC websocket opened')
+  }
+
+  close() {
+    if (this.wss) {
+      this.wss.close(1000, 'remote closed');
+      this.wss = null;
+
+      console.log('WebRTC websocket closed')
+    }
+  }
+
+  getWebSocket() {
+    return this.wss;
+  }
+}
+
+export default new WebRtcWebSocketClient();

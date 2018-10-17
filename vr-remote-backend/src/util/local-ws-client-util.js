@@ -1,31 +1,35 @@
 
-let ws = null;
-let isConnected = false;
+class LocalWebSocketClient {
 
-const localWsClientUtil = {
+  constructor() {
+    this.ws = null;
+    this.isConnected = false;
+  }
 
-  connect: () => {
-    if (ws) {
+  connect() {
+    if (this.ws) {
       return;
     }
 
-    ws = new WebSocket('ws://localhost:8080');
+    // always connect to local backend server
+    this.ws = new WebSocket('ws://localhost:8080');
 
-    ws.onopen = () => {
-      isConnected = true;
-      ws.send('Ping Pong')
+    this.ws.onopen = () => {
+      this.isConnected = true;
+      this.ws.send('Ping Pong')
     };
-  },
+  }
 
-  sendMessage: (msg) => {
-    if (isConnected) {
-      ws.send(msg);
+  sendMessage(msg) {
+    if (this.isConnected) {
+      this.ws.send(msg);
     }
-  },
+  }
 
-  getWebSocket: () => {
-    return ws;
-  },
-};
+  getWebSocket() {
+    return this.ws;
+  }
+}
 
-export default localWsClientUtil;
+
+export default new LocalWebSocketClient();

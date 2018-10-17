@@ -7,6 +7,7 @@ import localWsClientUtil from './util/local-ws-client-util';
 
 const Peer = require('simple-peer');
 
+const CORS_PROXY = 'https://vr-remote-control-cors-proxy.herokuapp.com';
 
 class WebRtcComponent extends React.Component {
 
@@ -20,7 +21,7 @@ class WebRtcComponent extends React.Component {
       peerConnection: this.getPeerConnection(this.props.stream),
       sdp: null,
       clientId: null,
-      roomId: '123456789abc',
+      roomId: '123456789abcd',
       wssUrl: null,
       errorMessage: null
     };
@@ -74,7 +75,7 @@ class WebRtcComponent extends React.Component {
     webSocketUtil.close();
 
     if (clientId && roomId) {
-      return axios.post(`https://cors-anywhere.herokuapp.com/https://appr.tc/leave/${roomId}/${clientId}`).then(() => {
+      return axios.post(`${CORS_PROXY}/https://appr.tc/leave/${roomId}/${clientId}`).then(() => {
         console.log(`Closed room ${roomId} (client: ${clientId})`);
 
       }).catch((error) => {
@@ -120,7 +121,7 @@ class WebRtcComponent extends React.Component {
   sendSDPOffer = () => {
     const { sdp, roomId, clientId } = this.state;
 
-    return axios.post(`https://cors-anywhere.herokuapp.com/https://appr.tc/message/${roomId}/${clientId}`,
+    return axios.post(`${CORS_PROXY}/https://appr.tc/message/${roomId}/${clientId}`,
       sdp).then((response) => {
 
       console.log('SDP registered:', response);
@@ -133,7 +134,7 @@ class WebRtcComponent extends React.Component {
   connectToRoom = () => {
     const { roomId } = this.state;
 
-    axios.post(`https://cors-anywhere.herokuapp.com/https://appr.tc/join/${roomId}`, {
+    axios.post(`${CORS_PROXY}/https://appr.tc/join/${roomId}`, {
       headers: {
         'Origin': 'null',
       },
