@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import WebRTC from './WebRTC';
 
-const getUserMedia = require('getusermedia');
-
 
 class IndexComponent extends React.Component {
 
@@ -20,11 +18,23 @@ class IndexComponent extends React.Component {
 
 
   getMedia = () => {
-    getUserMedia({ video: true, audio: true }, (err, stream) => {
-      if (err) return console.error(err);
-
-      this.setState({ stream });
-    })
+    navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+      .catch((error) => {
+        return navigator.mediaDevices.enumerateDevices()
+          .then((devices) => {
+            const cam = devices.find((device) => {
+              return device.kind === 'videoinput';
+            });
+            const mic = devices.find((device) => {
+              return device.kind === 'audioinput';
+            });
+            const constraints = { video: cam, audio: mic };
+            return navigator.mediaDevices.getUserMedia(constraints);
+          });
+      })
+      .then((stream) => {
+        this.setState({ stream });
+      });
   };
 
 

@@ -20,14 +20,13 @@
     "style-loader": "0.20.3",
     "webpack": "4.2.0",
     "webpack-cli": "2.0.13",
-    "webpack-dev-server": "^3.1.1"
+    "webpack-dev-server": "3.1.1"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "babel-preset-stage-2": "^6.24.1",
-    "getusermedia": "^2.0.1",
+    "axios": "0.18.0",
+    "babel-preset-stage-2": "6.24.1",
     "react": "16.2.0",
     "react-dom": "16.2.0",
-    "simple-peer": "^9.1.2"
+    "simple-peer": "9.1.2"
   }
 }

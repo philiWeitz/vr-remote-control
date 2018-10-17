@@ -22,7 +22,7 @@ class WebRtcComponent extends React.Component {
       sdp: null,
       clientSdp: null,
       clientId: null,
-      roomId: '123456789abcd',
+      roomId: '987654321xx',
       wssUrl: null,
       errorMessage: null
     };
@@ -105,20 +105,33 @@ class WebRtcComponent extends React.Component {
     };
 
     wss.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      const message = JSON.parse(data.msg);
+      try {
 
-      if (message.type === 'answer') {
-        this.state.peerConnection.signal(message);
-        this.setState({clientSdp: message})
-      } if (message.type === 'offer') {
-        this.setState({ errorMessage: 'Server is not the initializer!' });
-      } else if (message.type === 'bye') {
-        console.log('Client closed connection');
+        const data = JSON.parse(event.data);
+        const message = JSON.parse(data.msg);
 
-        this.state.peerConnection.destroy();
+        if (!message) {
+          console.error('Error getting undefined message', event);
+          return;
+        }
+
+        if (message.type === 'answer') {
+          this.state.peerConnection.signal(message);
+          this.setState({clientSdp: message})
+        }
+
+        if (message.type === 'offer') {
+          this.setState({errorMessage: 'Server is not the initializer!'});
+        } else if (message.type === 'bye') {
+          console.log('Client closed connection');
+
+          this.state.peerConnection.destroy();
+        }
+        console.log(data);
+
+      } catch(error) {
+        console.error('Error reading wss message', error);
       }
-      console.log(data);
     };
   };
 
