@@ -20,6 +20,7 @@ class WebRtcComponent extends React.Component {
     this.state = {
       peerConnection: this.getPeerConnection(this.props.stream),
       sdp: null,
+      clientSdp: null,
       clientId: null,
       roomId: '123456789abcd',
       wssUrl: null,
@@ -77,6 +78,7 @@ class WebRtcComponent extends React.Component {
     if (clientId && roomId) {
       return axios.post(`${CORS_PROXY}/https://appr.tc/leave/${roomId}/${clientId}`).then(() => {
         console.log(`Closed room ${roomId} (client: ${clientId})`);
+        this.setState({ clientSdp: null });
 
       }).catch((error) => {
         this.setState({errorMessage: error.toString()});
@@ -108,6 +110,9 @@ class WebRtcComponent extends React.Component {
 
       if (message.type === 'answer') {
         this.state.peerConnection.signal(message);
+        this.setState({clientSdp: message})
+      } if (message.type === 'offer') {
+        this.setState({ errorMessage: 'Server is not the initializer!' });
       } else if (message.type === 'bye') {
         console.log('Client closed connection');
 
@@ -171,6 +176,11 @@ class WebRtcComponent extends React.Component {
   };
 
 
+  onDisconnectFromRoomPress = () => {
+    this.disconnectFromRoom(this.state);
+    this.setState({ errorMessage: 'You are disconnected from the room!' });
+  };
+
   renderSDP() {
     const { sdp } = this.state;
 
@@ -182,9 +192,28 @@ class WebRtcComponent extends React.Component {
       )
     }
     return (
+      <div style={{ marginBottom: '20px' }}>
+        <p>Own SDP received:</p>
+        <textarea onChange={() => {}} style={{ width: '99%', height: '200px' }} value={JSON.stringify(sdp)}/>
+      </div>
+    )
+  }
+
+
+  renderClientSDP() {
+    const { clientSdp } = this.state;
+
+    if(!clientSdp) {
+      return (
+        <div>
+          Waiting for client...
+        </div>
+      )
+    }
+    return (
       <div>
-        <p>SDP received:</p>
-        <div>{JSON.stringify(sdp)}</div>
+        <p>Client SDP received:</p>
+        <textarea onChange={() => {}} style={{ width: '99%', height: '200px' }} value={JSON.stringify(clientSdp)}/>
       </div>
     )
   }
@@ -194,7 +223,7 @@ class WebRtcComponent extends React.Component {
     const { errorMessage } = this.state;
     if (errorMessage) {
       return (
-        <div>{errorMessage}</div>
+        <div style={{ marginTop: '20px', color: 'red' }} >{errorMessage}</div>
       )
     }
     return null;
@@ -205,7 +234,13 @@ class WebRtcComponent extends React.Component {
     return (
       <div>
         <p>Connecting...</p>
+
+        <button onClick={this.onDisconnectFromRoomPress}>
+          Disconnect from room
+        </button>
+
         {this.renderSDP()}
+        {this.renderClientSDP()}
         {this.renderErrorMessage()}
       </div>
     )

@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   INTERVAL_IN_MS: 1
-  RoomId: 123456789abc
+  RoomId: 123456789abcd
 --- !u!64 &974482048
 MeshCollider:
   m_ObjectHideFlags: 0
