@@ -3,11 +3,13 @@ import axios from 'axios';
 
 import webSocketUtil from './util/web-socket-util';
 import localWsClientUtil from './util/local-ws-client-util';
+import config from './util/simple-peer-config';
 
 
 const Peer = require('simple-peer');
 
-const CORS_PROXY = 'https://vr-remote-control-cors-proxy.herokuapp.com';
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com';
+//const CORS_PROXY = 'https://vr-remote-control-cors-proxy.herokuapp.com';
 
 class WebRtcComponent extends React.Component {
 
@@ -22,18 +24,19 @@ class WebRtcComponent extends React.Component {
       sdp: null,
       clientSdp: null,
       clientId: null,
-      roomId: '987654321xx',
+      roomId: '987654321xxxx2',
       wssUrl: null,
-      errorMessage: null
+      errorMessage: null,
+      isInitiator: '',
     };
   }
 
 
   getPeerConnection(stream) {
-    const peerConnection = new Peer({ initiator: true, trickle: false, stream, reconnectTimer: 1000 });
+    const peerConnection = new Peer({ initiator: true, trickle: false, stream, reconnectTimer: 1000, config });
 
     peerConnection.on('error', (err) => {
-      console.log('error', err)
+      console.log('error', err);
     });
 
     peerConnection.on('signal', (data) => {
@@ -54,7 +57,7 @@ class WebRtcComponent extends React.Component {
     });
 
     peerConnection.on('close', (data) => {
-      console.log(data);
+      console.log('Peer connection closed');
       this.setState({ peerConnection: this.getPeerConnection(this.props.stream) });
     });
 
@@ -105,15 +108,18 @@ class WebRtcComponent extends React.Component {
     };
 
     wss.onmessage = (event) => {
+      console.log('wss event triggered:', event);
+
       try {
-
         const data = JSON.parse(event.data);
-        const message = JSON.parse(data.msg);
 
-        if (!message) {
-          console.error('Error getting undefined message', event);
+        if (data.error) {
+          console.error('wss error detected:', data.error);
+          this.setState({ errorMessage: `wss - ${data.error}` });
           return;
         }
+
+        const message = JSON.parse(data.msg);
 
         if (message.type === 'answer') {
           this.state.peerConnection.signal(message);
@@ -127,7 +133,6 @@ class WebRtcComponent extends React.Component {
 
           this.state.peerConnection.destroy();
         }
-        console.log(data);
 
       } catch(error) {
         console.error('Error reading wss message', error);
@@ -165,6 +170,7 @@ class WebRtcComponent extends React.Component {
           clientId: params.client_id,
           roomId: params.room_id,
           wssUrl: params.wss_url,
+          isInitiator: params.is_initiator,
         };
         this.setState(webRtcData);
 
@@ -174,10 +180,7 @@ class WebRtcComponent extends React.Component {
         // register the web socket client
         this.registerWebSocket();
         // send SDP offer
-        this.sendSDPOffer().then(() => {
-          // disconnect immediately
-          //this.disconnectFromRoom(this.state);
-        });
+        this.sendSDPOffer();
 
       } else if (response.data.result === 'FULL') {
         this.setState({ errorMessage: 'Room is already full.' })
@@ -218,7 +221,7 @@ class WebRtcComponent extends React.Component {
 
     if(!clientSdp) {
       return (
-        <div>
+        <div style={{ marginBottom: '20px' }}>
           Waiting for client...
         </div>
       )
@@ -227,6 +230,28 @@ class WebRtcComponent extends React.Component {
       <div>
         <p>Client SDP received:</p>
         <textarea onChange={() => {}} style={{ width: '99%', height: '200px' }} value={JSON.stringify(clientSdp)}/>
+      </div>
+    )
+  }
+
+
+  renderRoom() {
+    const { roomId } = this.state;
+    return (
+      <div style={{ marginBottom: '20px' }}>
+        <div>Room</div>
+        {roomId}
+      </div>
+    )
+  }
+
+
+  renderInitiator() {
+    const { isInitiator } = this.state;
+    return (
+      <div style={{ marginBottom: '20px' }}>
+        <div>Initiator</div>
+        {isInitiator}
       </div>
     )
   }
@@ -247,6 +272,9 @@ class WebRtcComponent extends React.Component {
     return (
       <div>
         <p>Connecting...</p>
+
+        {this.renderRoom()}
+        {this.renderInitiator()}
 
         <button onClick={this.onDisconnectFromRoomPress}>
           Disconnect from room
