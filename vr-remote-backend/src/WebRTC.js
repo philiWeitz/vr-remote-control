@@ -21,8 +21,18 @@ class WebRtcComponent extends React.Component {
     // connect to local web socket
     localWsClientUtil.connect();
 
+    // get the last connection parameter
+    const localStorageState = JSON.parse(localStorage.getItem('vr-remote-state'));
+
+    // disconnect from last room
+    this.disconnectFromRoom(localStorageState).then(() => {
+      this.setState({
+        peerConnection: this.getPeerConnection(this.props.stream),
+      })
+    });
+
     this.state = {
-      peerConnection: this.getPeerConnection(this.props.stream),
+      peerConnection: null,
       sdp: null,
       clientSdp: null,
       clientId: null,
@@ -30,37 +40,36 @@ class WebRtcComponent extends React.Component {
       wssUrl: null,
       errorMessage: null,
       isInitiator: '',
+      candidates: [],
     };
   }
 
 
   getPeerConnection(stream) {
-    const peerConnection = new Peer({ initiator: true, trickle: false, stream, reconnectTimer: 1000, config });
+    const peerConnection = new Peer({ initiator: true, trickle: true, stream, reconnectTimer: 1000, config });
 
     peerConnection.on('error', (err) => {
       console.log('error', err);
     });
 
     peerConnection.on('signal', (data) => {
-      this.setState({ sdp: data });
+      const { candidates } = this.state;
 
-      try {
-        // get the last connection parameter
-        const localStorageState = JSON.parse(localStorage.getItem('vr-remote-state'));
+      if (data.type === 'offer') {
+        this.setState({ sdp: data });
+        this.connectToRoom();
 
-        // disconnect from last room
-        this.disconnectFromRoom(localStorageState).then(() => {
-          // connect to the room using the SDP
-          this.connectToRoom();
-        });
-      } catch(e) {
-        console.error(e);
+      } else if (data.candidate) {
+        candidates.push(data);
+        this.setState({ candidates });
+        console.log(data.candidate);
       }
     });
 
     peerConnection.on('close', (data) => {
       console.log('Peer connection closed');
-      this.setState({ peerConnection: this.getPeerConnection(this.props.stream) });
+      this.disconnectFromRoom(this.state);
+      this.setState({ peerConnection: this.getPeerConnection(this.props.stream), candidates: [] });
     });
 
     peerConnection.on('data', (data) => {
@@ -83,10 +92,10 @@ class WebRtcComponent extends React.Component {
     if (clientId && roomId) {
       return axios.post(`${CORS_PROXY}/https://appr.tc/leave/${roomId}/${clientId}`).then(() => {
         console.log(`Closed room ${roomId} (client: ${clientId})`);
-        this.setState({ clientSdp: null });
+        this.setState({ clientSdp: null, candidates: [] });
 
       }).catch((error) => {
-        this.setState({errorMessage: error.toString()});
+        this.setState({errorMessage: error.toString(), candidates: []});
       });
     }
     return Promise.reject();
@@ -122,10 +131,19 @@ class WebRtcComponent extends React.Component {
         }
 
         const message = JSON.parse(data.msg);
+        const { peerConnection } = this.state;
 
         if (message.type === 'answer') {
-          this.state.peerConnection.signal(message);
+          peerConnection.signal(message);
           this.setState({clientSdp: message})
+        } else if(message.type === 'candidate') {
+          const iceCandidate = new RTCIceCandidate(message);
+          iceCandidate.sdpMid = message.id;
+          iceCandidate.sdpMLineIndex = message.label;
+          
+          peerConnection._pc.addIceCandidate(iceCandidate)
+            .then(() => console.log('Remote candidate added'))
+            .catch((e) => console.log('Error adding remote candidate', e));
         }
 
         if (message.type === 'offer') {
@@ -133,7 +151,7 @@ class WebRtcComponent extends React.Component {
         } else if (message.type === 'bye') {
           console.log('Client closed connection');
 
-          this.state.peerConnection.destroy();
+          peerConnection.destroy();
         }
 
       } catch(error) {
@@ -144,12 +162,24 @@ class WebRtcComponent extends React.Component {
 
 
   sendSDPOffer = () => {
-    const { sdp, roomId, clientId } = this.state;
+    const { sdp, roomId, clientId, candidates } = this.state;
 
-    return axios.post(`${CORS_PROXY}/https://appr.tc/message/${roomId}/${clientId}`,
-      sdp).then((response) => {
+    return axios.post(`${CORS_PROXY}/https://appr.tc/message/${roomId}/${clientId}`, sdp)
+      .then((response) => {
+        console.log('SDP registered:', response);
+        console.log('Register candidates...');
 
-      console.log('SDP registered:', response);
+        Promise.all(candidates.map(item => {
+          const { candidate } = item;
+
+          candidate.type = 'candidate';
+          candidate.id = candidate.sdpMid;
+          candidate.label = candidate.sdpMLineIndex;
+
+          return axios.post(`${CORS_PROXY}/https://appr.tc/message/${roomId}/${clientId}`, candidate)
+            .then(() => console.log('Registered candidate', candidate))
+            .catch(e => console.error('Error registering candidate', e))
+        })).then(() => console.log('All candidates registered'))
     }).catch((error) => {
       this.setState({ errorMessage: error.toString() });
     });
@@ -199,6 +229,12 @@ class WebRtcComponent extends React.Component {
     this.setState({ errorMessage: 'You are disconnected from the room!' });
   };
 
+
+  handleChange = (event) => {
+    this.setState({sdp: JSON.parse(event.target.value)});
+  };
+
+
   renderSDP() {
     const { sdp } = this.state;
 
@@ -212,7 +248,7 @@ class WebRtcComponent extends React.Component {
     return (
       <div style={{ marginBottom: '20px' }}>
         <p>Own SDP received:</p>
-        <textarea onChange={() => {}} style={{ width: '99%', height: '200px' }} value={JSON.stringify(sdp)}/>
+        <textarea onChange={this.handleChange} style={{ width: '99%', height: '200px' }} value={JSON.stringify(sdp)}/>
       </div>
     )
   }
