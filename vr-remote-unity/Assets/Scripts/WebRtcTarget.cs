@@ -92,6 +92,7 @@ public class WebRtcTarget : MonoBehaviour
         AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
         plugin.SetStatic<AndroidJavaObject>("mainActivity", activity);
 
+        RoomId = PlayerPrefs.GetString("roomId");
         object[] webRtcParam = new object[1] { RoomId };
 
         // setup call environment
