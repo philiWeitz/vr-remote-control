@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import WebRTC from './WebRTC';
+import WebRTC from './web-rtc';
 
 
 class IndexComponent extends React.Component {
