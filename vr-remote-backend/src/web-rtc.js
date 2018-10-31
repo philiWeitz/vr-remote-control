@@ -33,7 +33,7 @@ class WebRtcComponent extends React.Component {
       roomId: roomFromLocationHash || '987654321xxxx2',
       wssUrl: null,
       errorMessage: null,
-      isInitiator: '',
+      isInitiator: true,
     };
   }
 
@@ -80,62 +80,66 @@ class WebRtcComponent extends React.Component {
   registerWebSocket = () => {
     const { wssUrl, roomId, clientId } = this.state;
 
-    // connect to web socket
-    webSocketUtil.init(wssUrl);
+    return new Promise((resolve) => {
+      // connect to web socket
+      webSocketUtil.init(wssUrl, roomId, clientId);
 
-    const wss = webSocketUtil.getWebSocket();
+      const wss = webSocketUtil.getWebSocket();
 
-    wss.onopen = () => {
-      wss.send(JSON.stringify({
-        cmd: "register",
-        roomid: roomId,
-        clientid: clientId
-      }));
-    };
+      wss.onopen = () => {
+        wss.send(JSON.stringify({
+          cmd: "register",
+          roomid: roomId,
+          clientid: clientId
+        }));
+        resolve();
+      };
 
-    wss.onmessage = (event) => {
-      console.log('wss event triggered:', event);
+      wss.onmessage = (event) => {
+        console.log('wss event triggered:', event);
 
-      try {
-        const data = JSON.parse(event.data);
+        try {
+          const data = JSON.parse(event.data);
 
-        if (data.error) {
-          console.error('wss error detected:', data.error);
-          this.setState({ errorMessage: `wss - ${data.error}` });
-          return;
+          if (data.error) {
+            console.error('wss error detected:', data.error);
+            this.setState({ errorMessage: `wss - ${data.error}` });
+            return;
+          }
+
+          const message = JSON.parse(data.msg);
+
+          if (message.type === 'answer') {
+            peerConnection.signal(message);
+            this.setState({clientSdp: message})
+
+          } else if(message.type === 'candidate') {
+            const iceCandidate = new RTCIceCandidate(message);
+            iceCandidate.sdpMid = message.id;
+            iceCandidate.sdpMLineIndex = message.label;
+
+            peerConnection.addIceCandidate(iceCandidate)
+              .then(() => console.log('Remote candidate added'))
+              .catch((e) => console.log('Error adding remote candidate', e));
+
+          } else if (message.type === 'offer') {
+            this.setState({errorMessage: 'Server is not the initializer!'});
+
+          } else if (message.type === 'bye') {
+            console.log('Client closed connection');
+            peerConnection.closePeerConnection();
+          }
+
+        } catch(error) {
+          console.error('Error reading wss message', error);
         }
 
-        const message = JSON.parse(data.msg);
-
-        if (message.type === 'answer') {
-          peerConnection.signal(message);
-          this.setState({clientSdp: message})
-
-        } else if(message.type === 'candidate') {
-          const iceCandidate = new RTCIceCandidate(message);
-          iceCandidate.sdpMid = message.id;
-          iceCandidate.sdpMLineIndex = message.label;
-          
-          peerConnection.addIceCandidate(iceCandidate)
-            .then(() => console.log('Remote candidate added'))
-            .catch((e) => console.log('Error adding remote candidate', e));
-
-        } else if (message.type === 'offer') {
-          this.setState({errorMessage: 'Server is not the initializer!'});
-
-        } else if (message.type === 'bye') {
-          console.log('Client closed connection');
-          peerConnection.closePeerConnection();
-        }
-
-      } catch(error) {
-        console.error('Error reading wss message', error);
-      }
-    };
+      };
+    });
   };
 
 
-  sendSDPOffer = () => {
+  sendSdpOfferHttps = () => {
     const { roomId, clientId } = this.state;
 
     return api.sendOffer(roomId, clientId, peerConnection.sdp)
@@ -176,7 +180,7 @@ class WebRtcComponent extends React.Component {
           clientId: params.client_id,
           roomId: params.room_id,
           wssUrl: params.wss_url,
-          isInitiator: params.is_initiator,
+          isInitiator: params.is_initiator === 'true',
         };
         this.setState(webRtcData);
 
@@ -184,9 +188,18 @@ class WebRtcComponent extends React.Component {
         localStorage.setItem('vr-remote-state', JSON.stringify(webRtcData));
 
         // register the web socket client
-        this.registerWebSocket();
-        // send SDP offer
-        this.sendSDPOffer();
+        this.registerWebSocket().then(() => {
+          const { isInitiator } = this.state;
+
+          if (isInitiator) {
+            // if initializer -> send SDP offer via https
+            this.sendSdpOfferHttps();
+          } else {
+            // if not -> restart
+            peerConnection.initiator = false;
+            setTimeout(() => peerConnection.closePeerConnection(), 10 * 1000);
+          }
+        });
 
       } else if (response.data.result === 'FULL') {
         this.setState({ errorMessage: 'Room is already full.' })
@@ -260,7 +273,7 @@ class WebRtcComponent extends React.Component {
     return (
       <div style={{ marginBottom: '20px' }}>
         <div>Initiator</div>
-        {isInitiator}
+        {isInitiator.toString()}
       </div>
     )
   }

@@ -15,6 +15,7 @@ class PeerConnection {
   sdp = null;
   candidates = [];
   peerConnection = null;
+  initiator = true;
 
   stream = null;
   onSignal = null;
@@ -47,10 +48,11 @@ class PeerConnection {
     return this.openPeerConnection(this.stream, this.onSignal, this.onClose);
   }
 
-  openPeerConnection(stream, onSignal, onClose) {
+  openPeerConnection(stream, onSignal, onClose, initiator = true) {
     this.stream = stream;
     this.onSignal = onSignal;
     this.onClose = onClose;
+    this.initiator = initiator;
 
     // close old peer connection first
     if (this.peerConnection) {
@@ -58,9 +60,10 @@ class PeerConnection {
     }
 
     this.peerConnection = new Peer({
-      initiator: true,
+      initiator,
       trickle: true,
-      stream, reconnectTimer: 1000,
+      stream,
+      reconnectTimer: 4000,
       peerConnectionConfig,
     });
 
