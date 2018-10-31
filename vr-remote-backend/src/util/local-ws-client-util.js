@@ -23,7 +23,19 @@ class LocalWebSocketClient {
   sendMessage(msg) {
     if (this.isConnected) {
       this.ws.send(msg);
+    } else {
+      console.warn('Unable to send message - locale WS not connected', msg);
     }
+  }
+
+  moveToDefaultPosition() {
+    const msg = JSON.stringify({ vertical: 0, horizontal: 0 });
+    this.sendMessage(msg);
+  }
+
+  moveToMaxPosition() {
+    const msg = JSON.stringify({ vertical: 0, horizontal: 4000 });
+    this.sendMessage(msg);
   }
 
   getWebSocket() {

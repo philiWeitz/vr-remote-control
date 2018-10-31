@@ -54,6 +54,8 @@ class WebRtcComponent extends React.Component {
 
 
   disconnectFromRoom = (params) => {
+    localWsClientUtil.moveToDefaultPosition();
+
     if (!params) {
       return Promise.resolve();
     }
@@ -65,6 +67,9 @@ class WebRtcComponent extends React.Component {
 
     // leave the room
     if (clientId && roomId) {
+      // close old websocket connection
+      api.deleteWebSocketConnection(roomId, clientId);
+
       return api.leaveRoom(roomId, clientId).then(() => {
         this.setState({ clientSdp: null });
         console.log(`Closed room ${roomId} (client: ${clientId})`);
@@ -159,7 +164,11 @@ class WebRtcComponent extends React.Component {
             .catch(e => console.error('Error registering candidate', e))
         })).then(() => {
           console.log('All candidates registered');
-          this.setState({ errorMessage: 'All candidates registered' })
+          this.setState({ errorMessage: 'All candidates registered' });
+
+          // visualize that WEB-RTC connection is ready
+          localWsClientUtil.moveToMaxPosition();
+          setTimeout(() => localWsClientUtil.moveToDefaultPosition(), 3000);
         })
 
     }).catch((error) => {
@@ -197,7 +206,7 @@ class WebRtcComponent extends React.Component {
           } else {
             // if not -> restart
             peerConnection.initiator = false;
-            setTimeout(() => peerConnection.closePeerConnection(), 10 * 1000);
+            setTimeout(() => peerConnection.closePeerConnection(), 4 * 1000);
           }
         });
 
