@@ -168,7 +168,7 @@ class WebRtcComponent extends React.Component {
 
           // visualize that WEB-RTC connection is ready
           localWsClientUtil.moveToMaxPosition();
-          setTimeout(() => localWsClientUtil.moveToDefaultPosition(), 3000);
+          setTimeout(() => localWsClientUtil.moveToDefaultPosition(), 2000);
         })
 
     }).catch((error) => {

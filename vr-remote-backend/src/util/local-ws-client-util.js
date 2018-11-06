@@ -29,12 +29,12 @@ class LocalWebSocketClient {
   }
 
   moveToDefaultPosition() {
-    const msg = JSON.stringify({ vertical: 0, horizontal: 0 });
+    const msg = JSON.stringify({ vertical: 700, horizontal: 1000 });
     this.sendMessage(msg);
   }
 
   moveToMaxPosition() {
-    const msg = JSON.stringify({ vertical: 0, horizontal: 4000 });
+    const msg = JSON.stringify({ vertical: 700, horizontal: 1500 });
     this.sendMessage(msg);
   }
 

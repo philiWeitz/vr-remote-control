@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import WebRTC from './web-rtc';
 
 
+const videoParams = true; // { width: 1280, height: 720, frameRate: 40 };
+
+
 class IndexComponent extends React.Component {
 
   constructor(props) {
@@ -18,17 +21,24 @@ class IndexComponent extends React.Component {
 
 
   getMedia = () => {
-    navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+    navigator.mediaDevices.getUserMedia({ audio: false, video: videoParams })
       .catch((error) => {
         return navigator.mediaDevices.enumerateDevices()
           .then((devices) => {
+
             const cam = devices.find((device) => {
               return device.kind === 'videoinput';
             });
+
             const mic = devices.find((device) => {
               return device.kind === 'audioinput';
             });
-            const constraints = { video: cam, audio: mic };
+
+            const constraints = {
+              audio: mic,
+              video: { ...cam, ...videoParams },
+            };
+
             return navigator.mediaDevices.getUserMedia(constraints);
           });
       })
