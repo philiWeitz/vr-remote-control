@@ -9,6 +9,7 @@ import android.util.Log;
 
 import remote.vr.com.remote_android.main.CallView;
 import remote.vr.com.remote_android.main.FrameCallback;
+import remote.vr.com.remote_android.util.HttpsUtil;
 
 
 public class PluginClass {
@@ -18,6 +19,8 @@ public class PluginClass {
     public static Activity mainActivity = null;
 
     final static int[] textureHandle = new int[1];
+
+    private static int sWidth = 0;
 
 
     public static class TextureResult {
@@ -32,6 +35,10 @@ public class PluginClass {
     }
 
     public static void setupCallView(String roomId) {
+        Log.d(TAG, "Allow all certificates...");
+        HttpsUtil.trustAllCertificates();
+        Log.d(TAG, "Done");
+
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -108,6 +115,16 @@ public class PluginClass {
             result.height = 0;
 
         } else {
+            if (bmp.getWidth() != sWidth) {
+                sWidth = bmp.getWidth();
+                mainActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CallView.instance().setResolution(bmp.getWidth() + "x" + bmp.getHeight());
+                    }
+                });
+            }
+
             int texturePointer = bitmapToTexture(bmp);
             result.texturePtr = texturePointer;
             result.width = bmp.getWidth();
@@ -163,10 +180,10 @@ public class PluginClass {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0, bmp, 0);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
         Log.v(TAG, "Texture id: " + textureHandle[0]);

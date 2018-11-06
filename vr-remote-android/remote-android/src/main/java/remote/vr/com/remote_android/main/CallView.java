@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.UUID;
@@ -41,6 +43,8 @@ public class CallView {
     private PeerConnectionClient mPeerConnectionClient = null;
     private PeerConnectionEvents mPeerConnectionEvents = null;
 
+    private TextView mResolutionTextView = null;
+
 
     public void start() {
         if (mPeerConnectionClient != null) {
@@ -64,6 +68,13 @@ public class CallView {
     public void sendMessage(String msg) {
         if (mPeerConnectionClient != null) {
             mPeerConnectionClient.sendDataByChannel(msg);
+        }
+    }
+
+
+    public void setResolution(String resolution) {
+        if(null != mResolutionTextView) {
+            this.mResolutionTextView.setText(resolution);
         }
     }
 
@@ -104,11 +115,24 @@ public class CallView {
                 .findViewById(android.R.id.content)).getChildAt(0);
 
         TextView textView = new TextView(mActivity);
+        mResolutionTextView = new TextView(mActivity);
+
         viewGroup.addView(textView);
+        viewGroup.addView(mResolutionTextView);
 
         textView.getLayoutParams().width = 300;
         textView.getLayoutParams().height = 100;
         textView.setTextColor(Color.GREEN);
+
+        mResolutionTextView.getLayoutParams().width = 300;
+        mResolutionTextView.getLayoutParams().height = 100;
+        mResolutionTextView.setTextColor(Color.GREEN);
+
+        if(mResolutionTextView.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            ((FrameLayout.LayoutParams) mResolutionTextView.getLayoutParams()).leftMargin = 400;
+        } else if(mResolutionTextView.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            ((RelativeLayout.LayoutParams) mResolutionTextView.getLayoutParams()).leftMargin = 400;
+        }
 
         mPeerConnectionClient = new PeerConnectionClient();
         mSignalingEvents = new SignalingEvents(mPeerConnectionClient, mActivity);
