@@ -135,7 +135,7 @@ public class WebRtcTarget : MonoBehaviour
         }
     }
 
-    void RenderExternalAlpha8Texture()
+    /*void RenderExternalAlpha8Texture()
     {
         if (Application.platform != RuntimePlatform.Android)
         {
@@ -166,12 +166,13 @@ public class WebRtcTarget : MonoBehaviour
             {
                 nativeTexture = Texture2D.CreateExternalTexture(
                     width, height, TextureFormat.Alpha8, false, false, (IntPtr)texPtr);
+                nativeTexture.filterMode = FilterMode.Point;
             }
 
             this.GetComponent<Renderer>().material.mainTexture = nativeTexture;
             nativeTexture.UpdateExternalTexture((IntPtr)texPtr);
         }
-    }
+    }*/
 
     void RenderExternalArgbTexture()
     {
@@ -202,6 +203,7 @@ public class WebRtcTarget : MonoBehaviour
             {
                 nativeTexture = Texture2D.CreateExternalTexture(
                     width, height, TextureFormat.ARGB32, false, false, (IntPtr)texPtr);
+                nativeTexture.filterMode = FilterMode.Point;
             }
 
             this.GetComponent<Renderer>().material.mainTexture = nativeTexture;

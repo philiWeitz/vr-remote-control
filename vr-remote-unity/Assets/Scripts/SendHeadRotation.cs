@@ -6,6 +6,8 @@ public class SendHeadRotation : MonoBehaviour
 {
     public int INTERVAL_IN_MS = 50;
 
+    public float MAX_ANGLE_DIFFERENCE = 2;
+
     private double timeLastExecution = 0;
 
     private Vector3 lastHeadPosition = new Vector3(100,100,100);
@@ -47,9 +49,9 @@ public class SendHeadRotation : MonoBehaviour
 
     bool HeadPositionHasChanged(Vector3 currentHeadPosition) {
         Vector3 sub = currentHeadPosition - lastHeadPosition;
-        float sum = Mathf.Abs(sub.x) + Mathf.Abs(sub.y) + Mathf.Abs(sub.z);
-
-        return (sum >= 1);
+        return (sub.x >= MAX_ANGLE_DIFFERENCE
+                || sub.y >= MAX_ANGLE_DIFFERENCE 
+                || sub.z >= MAX_ANGLE_DIFFERENCE);
     }
 
 
