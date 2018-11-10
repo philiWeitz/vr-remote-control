@@ -28,6 +28,8 @@ public class WebRtcTarget : MonoBehaviour
         //RenderExternalTexture();
         //RenderExternalAlpha8Texture();   
         RenderExternalArgbTexture();
+
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
 

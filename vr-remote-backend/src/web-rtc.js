@@ -13,8 +13,6 @@ class WebRtcComponent extends React.Component {
   constructor(props) {
     super(props);
 
-    const roomFromLocationHash = location.hash.substr(1,location.hash.length);
-
     // connect to local web socket
     localWsClientUtil.connect();
 
@@ -30,7 +28,7 @@ class WebRtcComponent extends React.Component {
     this.state = {
       clientSdp: null,
       clientId: null,
-      roomId: roomFromLocationHash || '987654321xxxx2',
+      roomId: this.props.roomId,
       wssUrl: null,
       errorMessage: null,
       isInitiator: true,

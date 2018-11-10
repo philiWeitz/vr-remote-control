@@ -49,9 +49,9 @@ public class SendHeadRotation : MonoBehaviour
 
     bool HeadPositionHasChanged(Vector3 currentHeadPosition) {
         Vector3 sub = currentHeadPosition - lastHeadPosition;
-        return (sub.x >= MAX_ANGLE_DIFFERENCE
-                || sub.y >= MAX_ANGLE_DIFFERENCE 
-                || sub.z >= MAX_ANGLE_DIFFERENCE);
+        float sum = Mathf.Abs(sub.x) + Mathf.Abs(sub.y) + Mathf.Abs(sub.z);
+
+        return (sum >= 0.1);
     }
 
 
