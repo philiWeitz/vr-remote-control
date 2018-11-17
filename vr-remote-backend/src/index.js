@@ -42,7 +42,7 @@ class IndexComponent extends React.Component {
     const { width, height } = this.state;
 
     const videoParams = (width > 0 && height > 0)
-      ? { width: { exact: width }, height: { exact: height }}
+      ? { width: { exact: width }, height: { exact: height }, frameRate: { ideal: 24, max: 30 }}
       : true;
 
     navigator.mediaDevices.getUserMedia({ audio: false, video: videoParams })
