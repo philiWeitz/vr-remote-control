@@ -7,12 +7,18 @@ import org.webrtc.VideoRenderer;
 
 import java.nio.ByteBuffer;
 
+import remote.vr.com.remote_android.util.PerformanceLogger;
+
 public class FrameCallback {
 
     private static final String TAG = "VR-REMOTE";
     private static final boolean RENDER_ARGB = true;
 
     public static FrameCallback sFrameCallback;
+
+    private static PerformanceLogger perfLogger = new PerformanceLogger(
+        1000, "Performance YUV Frame get Bitmap");
+
 
     private FrameCallback() {
 
@@ -69,7 +75,9 @@ public class FrameCallback {
             mBitmap.recycle();
         }
 
+        perfLogger.start();
         mBitmap = mYuvFrame.getBitmap();
+        perfLogger.stop();
 
         return mBitmap;
     }

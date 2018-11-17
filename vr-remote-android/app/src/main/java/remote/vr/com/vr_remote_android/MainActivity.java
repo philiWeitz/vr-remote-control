@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
         super.onStart();
 
         PluginClass.mainActivity = this;
-        PluginClass.setupCallView("123456789abcd");
+        PluginClass.setupCallView("123456789xx");
         PluginClass.startCallView();
         PluginClass.connectToMotionWebSocket();
 

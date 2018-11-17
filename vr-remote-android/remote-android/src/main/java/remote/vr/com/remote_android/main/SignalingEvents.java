@@ -1,6 +1,7 @@
 package remote.vr.com.remote_android.main;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,8 +19,13 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
 
     private static final String TAG = "VR-REMOTE";
 
+    private static final int FPS_DELAY_TIME = 10 * 1000;
+
     private Activity mActivity;
     private PeerConnectionClient mPeerConnectionClient;
+
+    private Handler mFpsHandler = new Handler();
+    private double mFramesPer10SecondsCounter = 0;
 
 
     public SignalingEvents(PeerConnectionClient peerConnectionClient, Activity activity) {
@@ -45,6 +51,8 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
                 }
             }
         }
+
+        mFpsHandler.postDelayed(LogFps, FPS_DELAY_TIME);
     }
 
     @Override
@@ -68,6 +76,7 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
 
     @Override
     public void onChannelClose() {
+        mFpsHandler.removeCallbacks(LogFps);
         Log.d(TAG, "Signalling channel closed");
     }
 
@@ -85,6 +94,8 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
     private VideoRenderer.Callbacks mVideoRendererCallbacks = new VideoRenderer.Callbacks() {
         @Override
         public void renderFrame(VideoRenderer.I420Frame i420Frame) {
+            ++mFramesPer10SecondsCounter;
+
             FrameCallback.instance().onFrame(i420Frame);
             VideoRenderer.renderFrameDone(i420Frame);
         }
@@ -94,6 +105,15 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
         @Override
         public void onFrame(VideoFrame videoFrame) {
             videoFrame.release();
+        }
+    };
+
+    private Runnable LogFps = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "FPS: " + (int) (mFramesPer10SecondsCounter / 10.0));
+            mFramesPer10SecondsCounter = 0;
+            mFpsHandler.postDelayed(this, FPS_DELAY_TIME);
         }
     };
 }

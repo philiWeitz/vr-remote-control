@@ -6,10 +6,12 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
+import android.view.WindowManager;
 
 import remote.vr.com.remote_android.main.CallView;
 import remote.vr.com.remote_android.main.FrameCallback;
 import remote.vr.com.remote_android.util.HttpsUtil;
+import remote.vr.com.remote_android.util.PerformanceLogger;
 
 
 public class PluginClass {
@@ -22,6 +24,8 @@ public class PluginClass {
 
     private static int sWidth = 0;
 
+    private static PerformanceLogger perfLogger = new PerformanceLogger(
+            1000, "Performance get ARGB texture");
 
     public static class TextureResult {
         public int width;
@@ -35,6 +39,16 @@ public class PluginClass {
     }
 
     public static void setupCallView(String roomId) {
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Increase screen brightness...");
+                WindowManager.LayoutParams layoutParams = mainActivity.getWindow().getAttributes();
+                layoutParams.screenBrightness = 0.99f;
+                mainActivity.getWindow().setAttributes(layoutParams);
+            }
+        });
+
         Log.d(TAG, "Allow all certificates...");
         HttpsUtil.trustAllCertificates();
         Log.d(TAG, "Done");
@@ -106,6 +120,7 @@ public class PluginClass {
     public static TextureResult getArgbTextureResult() {
         Log.v(TAG, "Generate ARGB texture");
 
+        perfLogger.start();
         TextureResult result = new TextureResult();
         Bitmap bmp = FrameCallback.instance().getArgbBitmap();
 
@@ -132,6 +147,7 @@ public class PluginClass {
         }
 
         FrameCallback.instance().setIsNewFrame(false);
+        perfLogger.stop();
 
         return result;
     }

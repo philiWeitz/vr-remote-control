@@ -41,11 +41,17 @@ dependencies {
 preBuild.doFirst {
     delete "build/outputs/aar/remote-android-debug.aar"
     delete "../../vr-remote-unity/Assets/Plugins/Android/libs/remote-android-debug.aar"
+    delete "build/outputs/aar/remote-android-release.aar"
+    delete "../../vr-remote-unity/Assets/Plugins/Android/libs/remote-android-release.aar"
 }
 
 gradle.buildFinished {
     copy {
         from 'build/outputs/aar/remote-android-debug.aar'
+        into "../../vr-remote-unity/Assets/Plugins/Android/libs"
+    }
+    copy {
+        from 'build/outputs/aar/remote-android-release.aar'
         into "../../vr-remote-unity/Assets/Plugins/Android/libs"
     }
 }
