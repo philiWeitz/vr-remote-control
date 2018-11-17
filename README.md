@@ -1,3 +1,8 @@
+
+# Raspberry PI autostart script
+sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
+@sh <path to script>
+
 # Camera remote control via Mobile VR
 
 This project tries to create remote controlled WebCam which can be

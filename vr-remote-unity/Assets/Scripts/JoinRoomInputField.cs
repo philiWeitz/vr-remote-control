@@ -13,12 +13,17 @@ public class JoinRoomInputField : MonoBehaviour {
     }
 
     public void ChangeScene() {
-        PlayerPrefs.SetString("roomId", input.text);
+        string roomId = input.text;
+
+        if (string.IsNullOrEmpty(roomId)) {
+            roomId = "autoRoom1";
+        }
+
+        PlayerPrefs.SetString("roomId", roomId);
         UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
 
     public void FocusInputField() {
-        Debug.Log("ddddddddddd");
         input.ActivateInputField();
     }
 }
