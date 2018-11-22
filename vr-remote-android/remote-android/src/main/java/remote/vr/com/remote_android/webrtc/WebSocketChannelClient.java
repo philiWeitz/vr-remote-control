@@ -37,7 +37,7 @@ import remote.vr.com.remote_android.util.AsyncHttpURLConnection.AsyncHttpEvents;
  * All events are dispatched on the same thread.
  */
 public class WebSocketChannelClient {
-    private static final String TAG = "WSChannelRTCClient";
+    private static final String TAG = "VR-REMOTE-SOCKET";
     private static final int CLOSE_TIMEOUT = 1000;
     private final WebSocketChannelEvents events;
     private final Handler handler;
@@ -180,7 +180,7 @@ public class WebSocketChannelClient {
     public void disconnect(boolean waitForComplete) {
         checkIfCalledOnValidThread();
         Log.d(TAG, "Disconnect WebSocket. State: " + state);
-        if (state == WebSocketConnectionState.REGISTERED) {
+        if (state == WebSocketConnectionState.REGISTERED || state == WebSocketConnectionState.NEW) {
             // Send "bye" to WebSocket server.
             send("{\"type\": \"bye\"}");
             state = WebSocketConnectionState.CONNECTED;

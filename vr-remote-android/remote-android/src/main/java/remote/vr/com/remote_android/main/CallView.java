@@ -53,8 +53,11 @@ public class CallView {
     }
 
     public void stop() {
+        leaveLastRoom(mActivity);
+
         if (mPeerConnectionClient != null) {
             mPeerConnectionClient.stopVideoSource();
+            disconnect();
         }
     }
 

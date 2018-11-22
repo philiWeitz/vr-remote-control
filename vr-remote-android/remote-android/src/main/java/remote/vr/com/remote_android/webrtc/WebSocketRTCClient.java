@@ -38,7 +38,7 @@ import remote.vr.com.remote_android.webrtc.WebSocketChannelClient.WebSocketConne
  * be sent after WebSocket connection is established.
  */
 public class WebSocketRTCClient implements AppRTCClient, WebSocketChannelEvents {
-  private static final String TAG = "WSRTCClient";
+  private static final String TAG = "VR-REMOTE-SOCKET";
   private static final String ROOM_JOIN = "join";
   private static final String ROOM_MESSAGE = "message";
   private static final String ROOM_LEAVE = "leave";
