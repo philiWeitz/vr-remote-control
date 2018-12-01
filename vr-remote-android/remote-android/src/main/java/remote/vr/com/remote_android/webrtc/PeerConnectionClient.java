@@ -581,12 +581,6 @@ public class PeerConnectionClient {
 
     sdpMediaConstraints.mandatory.add(
         new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-
-    if (videoCallEnabled || peerConnectionParameters.loopback) {
-      sdpMediaConstraints.mandatory.add(
-          new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-    }
-
   }
 
   private void createPeerConnectionInternal() {
@@ -873,7 +867,7 @@ public class PeerConnectionClient {
           sdpDescription = preferCodec(sdpDescription, AUDIO_CODEC_ISAC, true);
         }
         if (videoCallEnabled) {
-          sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
+          sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, true);
         }
         if (peerConnectionParameters.audioStartBitrate > 0) {
           sdpDescription = setStartBitrate(
