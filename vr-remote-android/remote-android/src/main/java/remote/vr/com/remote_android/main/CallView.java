@@ -45,6 +45,9 @@ public class CallView {
 
     private TextView mResolutionTextView = null;
 
+    private String mRoomId = "";
+    private boolean mActivateCamera = false;
+
 
     public void start() {
         if (mPeerConnectionClient != null) {
@@ -67,6 +70,16 @@ public class CallView {
         }
     }
 
+    public void reset() {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+                onCreate(mActivity, mRoomId, mActivateCamera);
+                start();
+            }
+        });
+    }
 
     public void sendMessage(String msg) {
         if (mPeerConnectionClient != null) {
@@ -110,6 +123,8 @@ public class CallView {
 
     public void onCreate(Activity activity, String roomId, boolean activateCamera) {
         this.mActivity = activity;
+        this.mRoomId = roomId;
+        this.mActivateCamera = activateCamera;
 
         // leave the previous room before starting a new connection
         leaveLastRoom(activity);

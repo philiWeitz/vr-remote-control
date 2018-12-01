@@ -93,6 +93,9 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
     public void onChannelClose() {
         mFpsHandler.removeCallbacks(LogFps);
         Log.d(TAG, "Signalling channel closed");
+
+        // reset connection after other party has left the call
+        CallView.instance().reset();
     }
 
     @Override
