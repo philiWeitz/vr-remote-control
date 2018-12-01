@@ -39,6 +39,10 @@ public class PluginClass {
     }
 
     public static void setupCallView(String roomId) {
+        setupCallView(roomId, false);
+    }
+
+    public static void setupCallView(String roomId, boolean activateCamera) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -57,7 +61,7 @@ public class PluginClass {
             @Override
             public void run() {
                 Log.d(TAG, "Setup Call View... (roomId: " + roomId);
-                CallView.instance().onCreate(mainActivity, roomId);
+                CallView.instance().onCreate(mainActivity, roomId, activateCamera);
             }
         });
     }

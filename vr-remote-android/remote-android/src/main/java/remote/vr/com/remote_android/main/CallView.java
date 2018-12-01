@@ -108,7 +108,7 @@ public class CallView {
     }
 
 
-    public void onCreate(Activity activity, String roomId) {
+    public void onCreate(Activity activity, String roomId, boolean activateCamera) {
         this.mActivity = activity;
 
         // leave the previous room before starting a new connection
@@ -138,7 +138,7 @@ public class CallView {
         }
 
         mPeerConnectionClient = new PeerConnectionClient();
-        mSignalingEvents = new SignalingEvents(mPeerConnectionClient, mActivity);
+        mSignalingEvents = new SignalingEvents(mPeerConnectionClient, mActivity, activateCamera);
 
         String webRtcRoomId = roomId;
 
@@ -160,7 +160,8 @@ public class CallView {
         mPeerConnectionEvents = new PeerConnectionEvents(mAppRtcClient);
 
         mPeerConnectionClient.createPeerConnectionFactory(
-                mActivity.getApplicationContext(), getPeerParameter(), mPeerConnectionEvents);
+                mActivity.getApplicationContext(),
+                getPeerParameter(), mPeerConnectionEvents);
 
         Uri roomUri = Uri.parse(APP_RTC_URL);
 
@@ -210,7 +211,7 @@ public class CallView {
                 false,
                 32,
                 "OPUS",
-                true,
+                false,
                 false,
                 false,
                 false,

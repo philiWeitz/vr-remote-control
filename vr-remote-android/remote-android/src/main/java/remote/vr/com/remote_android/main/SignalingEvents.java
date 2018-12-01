@@ -5,8 +5,11 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.webrtc.Camera2Enumerator;
 import org.webrtc.IceCandidate;
+import org.webrtc.Logging;
 import org.webrtc.SessionDescription;
+import org.webrtc.VideoCapturer;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoSink;
@@ -24,19 +27,31 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
     private Activity mActivity;
     private PeerConnectionClient mPeerConnectionClient;
 
+    private boolean mActivateCamera = false;
+
     private Handler mFpsHandler = new Handler();
     private double mFramesPer10SecondsCounter = 0;
 
-
-    public SignalingEvents(PeerConnectionClient peerConnectionClient, Activity activity) {
+    public SignalingEvents(PeerConnectionClient peerConnectionClient, Activity activity, boolean activateCamera) {
         this.mActivity = activity;
+        this.mActivateCamera = activateCamera;
         this.mPeerConnectionClient = peerConnectionClient;
     }
 
     @Override
     public void onConnectedToRoom(AppRTCClient.SignalingParameters params) {
+        VideoCapturer capturer = null;
+
+        if(mActivateCamera) {
+            capturer = createVideoCapturer();
+        }
+
         mPeerConnectionClient.createPeerConnection(
-                mVideoSink, mVideoRendererCallbacks, null, params);
+                mVideoSink, mVideoRendererCallbacks, capturer, params);
+
+        if (null != capturer) {
+            capturer.changeCaptureFormat(1280, 720, 30);
+        }
 
         if (params.initiator) {
             mPeerConnectionClient.createOffer();
@@ -116,4 +131,28 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
             mFpsHandler.postDelayed(this, FPS_DELAY_TIME);
         }
     };
+
+    private VideoCapturer createVideoCapturer() {
+        if (null != mActivity) {
+            Camera2Enumerator enumerator = new Camera2Enumerator(mActivity);
+            final String[] deviceNames = enumerator.getDeviceNames();
+
+            Logging.d(TAG, "Getting front facing camera");
+            for (String deviceName : deviceNames) {
+                if (enumerator.isFrontFacing(deviceName)) {
+                    Logging.d(TAG, "Creating front facing camera capturer.");
+                    VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+
+                    if (videoCapturer != null) {
+                        Logging.e(TAG, "Unable to create video capturer");
+                    }
+                    return videoCapturer;
+                }
+            }
+            Logging.e(TAG, "Unable to find front facing camera");
+            return null;
+        }
+        Logging.e(TAG, "Unable to create video capturer - activity not set");
+        return null;
+    }
 }

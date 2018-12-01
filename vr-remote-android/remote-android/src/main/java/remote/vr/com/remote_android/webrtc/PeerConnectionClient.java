@@ -620,7 +620,7 @@ public class PeerConnectionClient {
     MediaConstraints mediaConstraints = new MediaConstraints();
     peerConnection = factory.createPeerConnection(rtcConfig, mediaConstraints, pcObserver);
 
-    /*if (dataChannelEnabled) {
+    if (dataChannelEnabled) {
       DataChannel.Init init = new DataChannel.Init();
       init.ordered = peerConnectionParameters.dataChannelParameters.ordered;
       init.negotiated = peerConnectionParameters.dataChannelParameters.negotiated;
@@ -629,7 +629,24 @@ public class PeerConnectionClient {
       init.id = peerConnectionParameters.dataChannelParameters.id;
       init.protocol = peerConnectionParameters.dataChannelParameters.protocol;
       dataChannel = peerConnection.createDataChannel("ApprtcDemo data", init);
-    }*/
+
+      dataChannel.registerObserver(new DataChannel.Observer() {
+        @Override
+        public void onBufferedAmountChange(long l) {
+
+        }
+
+        @Override
+        public void onStateChange() {
+
+        }
+
+        @Override
+        public void onMessage(DataChannel.Buffer buffer) {
+          onDataChannelData(buffer, dataChannel);
+        }
+      });
+    }
     isInitiator = false;
 
     // Set INFO libjingle logging.
@@ -669,8 +686,9 @@ public class PeerConnectionClient {
     }
     Log.d(TAG, "Closing peer connection.");
     statsTimer.cancel();
-    if (dataChannel != null) {
-      //dataChannel.dispose();
+    if (dataChannel != null && dataChannel.state() == DataChannel.State.OPEN) {
+      dataChannel.close();
+      dataChannel.dispose();
       dataChannel = null;
     }
     if (peerConnection != null) {
@@ -1255,8 +1273,12 @@ public class PeerConnectionClient {
     public void onDataChannel(final DataChannel dc) {
       Log.d(TAG, "New Data channel " + dc.label());
 
-      if (!dataChannelEnabled)
+      if (null == dc) {
         return;
+      }
+      if (null != dataChannel) {
+        dataChannel.dispose();
+      }
 
       dataChannel = dc;
 
@@ -1273,15 +1295,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onMessage(final DataChannel.Buffer buffer) {
-          if (buffer.binary) {
-            Log.d(TAG, "Received binary msg over " + dc);
-            return;
-          }
-          ByteBuffer data = buffer.data;
-          final byte[] bytes = new byte[data.capacity()];
-          data.get(bytes);
-          String strData = new String(bytes, Charset.forName("UTF-8"));
-          Log.d(TAG, "Got msg: " + strData + " over " + dc);
+          onDataChannelData(buffer, dc);
         }
       });
     }
@@ -1294,6 +1308,20 @@ public class PeerConnectionClient {
 
     @Override
     public void onAddTrack(final RtpReceiver receiver, final MediaStream[] mediaStreams) {}
+  }
+
+  public void onDataChannelData(DataChannel.Buffer buffer, DataChannel dc) {
+    if (buffer.binary) {
+      Log.d(TAG, "Received binary msg over " + dc);
+      return;
+    }
+    ByteBuffer data = buffer.data;
+    final byte[] bytes = new byte[data.capacity()];
+    data.get(bytes);
+    String strData = new String(bytes, Charset.forName("UTF-8"));
+    Log.v(TAG, "Received message over data channel: " + strData);
+
+    // TODO: add microcontroller serial communication here
   }
 
   // Implementation detail: handle offer creation/signaling and answer setting,
