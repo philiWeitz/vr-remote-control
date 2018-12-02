@@ -49,16 +49,6 @@ public class RawImageWebRTC : MonoBehaviour
     }
 
 
-    private void OnApplicationPause(bool pause)
-    {
-        if (Application.platform == RuntimePlatform.Android && pause == true)
-        {
-            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
-            plugin.CallStatic("closeWebRtcConnection");
-        }
-    }
-
-
     void FlipComponentVertical()
     {
         Debug.Log("Flipping vertically");

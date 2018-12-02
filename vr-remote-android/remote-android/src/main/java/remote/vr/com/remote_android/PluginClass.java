@@ -48,7 +48,12 @@ public class PluginClass {
             public void run() {
                 Log.d(TAG, "Increase screen brightness...");
                 WindowManager.LayoutParams layoutParams = mainActivity.getWindow().getAttributes();
-                layoutParams.screenBrightness = 0.99f;
+
+                if(activateCamera) {
+                    layoutParams.screenBrightness = 0.01f;
+                } else {
+                    layoutParams.screenBrightness = 0.99f;
+                }
                 mainActivity.getWindow().setAttributes(layoutParams);
             }
         });

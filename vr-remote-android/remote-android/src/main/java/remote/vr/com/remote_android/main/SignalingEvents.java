@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.webrtc.Camera2Enumerator;
+import org.webrtc.CameraVideoCapturer;
 import org.webrtc.IceCandidate;
 import org.webrtc.Logging;
 import org.webrtc.SessionDescription;
@@ -32,6 +33,10 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
     private Handler mFpsHandler = new Handler();
     private double mFramesPer10SecondsCounter = 0;
 
+    private VideoCapturer mCapturer = null;
+    private boolean mResolutionSet = false;
+
+
     public SignalingEvents(PeerConnectionClient peerConnectionClient, Activity activity, boolean activateCamera) {
         this.mActivity = activity;
         this.mActivateCamera = activateCamera;
@@ -40,21 +45,16 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
 
     @Override
     public void onConnectedToRoom(AppRTCClient.SignalingParameters params) {
-        VideoCapturer capturer = null;
-
         if(mActivateCamera) {
-            capturer = createVideoCapturer();
+            mCapturer = createVideoCapturer();
         }
 
         mPeerConnectionClient.createPeerConnection(
-                mVideoSink, mVideoRendererCallbacks, capturer, params);
-
-        if (null != capturer) {
-            capturer.changeCaptureFormat(1280, 720, 30);
-        }
+                mVideoSink, mVideoRendererCallbacks, mCapturer, params);
 
         if (params.initiator) {
             mPeerConnectionClient.createOffer();
+
         } else {
             if (params.offerSdp != null) {
                 mPeerConnectionClient.setRemoteDescription(params.offerSdp);
@@ -144,7 +144,7 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
             for (String deviceName : deviceNames) {
                 if (enumerator.isFrontFacing(deviceName)) {
                     Logging.d(TAG, "Creating front facing camera capturer.");
-                    VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+                    VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, mCapturerEventHandler);
 
                     if (videoCapturer != null) {
                         Logging.e(TAG, "Unable to create video capturer");
@@ -158,4 +158,39 @@ class SignalingEvents implements AppRTCClient.SignalingEvents {
         Logging.e(TAG, "Unable to create video capturer - activity not set");
         return null;
     }
+
+
+    private CameraVideoCapturer.CameraEventsHandler mCapturerEventHandler = new CameraVideoCapturer.CameraEventsHandler() {
+        @Override
+        public void onCameraError(String s) {
+            Log.e(TAG, "Video capturer error: " + s);
+        }
+
+        @Override
+        public void onCameraDisconnected() { }
+
+        @Override
+        public void onCameraFreezed(String s) { }
+
+        @Override
+        public void onCameraOpening(String s) {
+            if (!mResolutionSet) {
+                mResolutionSet = true;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCapturer.changeCaptureFormat(800, 600, 30);
+                    }
+                }, 2000);
+            }
+        }
+
+        @Override
+        public void onFirstFrameAvailable() {
+
+        }
+
+        @Override
+        public void onCameraClosed() { }
+    };
 }

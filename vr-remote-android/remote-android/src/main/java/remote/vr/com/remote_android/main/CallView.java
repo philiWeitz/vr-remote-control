@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -75,8 +76,13 @@ public class CallView {
             @Override
             public void run() {
                 stop();
-                onCreate(mActivity, mRoomId, mActivateCamera);
-                start();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        onCreate(mActivity, mRoomId, mActivateCamera);
+                        start();
+                    }
+                }, 3000);
             }
         });
     }
