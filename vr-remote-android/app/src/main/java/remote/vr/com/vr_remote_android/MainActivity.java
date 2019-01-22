@@ -16,6 +16,7 @@ import remote.vr.com.remote_android.PluginClass;
 import remote.vr.com.remote_android.main.CallView;
 import remote.vr.com.remote_android.main.FrameCallback;
 import remote.vr.com.remote_android.main.SharedPreferencesUtil;
+import remote.vr.com.remote_android.serial.BleController;
 
 public class MainActivity extends Activity {
 
@@ -24,6 +25,7 @@ public class MainActivity extends Activity {
 
     private Handler handler = new Handler();
     private ImageView mImageView;
+    private ImageView mImageViewSmile;
 
     private String roomId = "";
     private EditText mRoomEditText;
@@ -38,6 +40,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mImageView = (ImageView) findViewById(R.id.imageView);
+        mImageViewSmile = (ImageView) findViewById(R.id.imageViewSmile);
         mRoomEditText = (EditText) findViewById(R.id.main_activity_room_input);
         mRoomEditLayout = findViewById(R.id.main_activity_room_input_layout);
 
@@ -64,6 +67,12 @@ public class MainActivity extends Activity {
         if(mWebRtcRunning) {
             joinRoom();
         }
+
+        // open connection to the Arduino
+        if (IS_CAMERA_CLIENT) {
+            // SerialController.instance().openDriver(this);
+            BleController.instance().openConnection(this);
+        }
     }
 
     public void onJoinRoomButtonClick(View v) {
@@ -74,6 +83,10 @@ public class MainActivity extends Activity {
             roomId = STATIC_ROOM_ID;
         }
         joinRoom();
+    }
+
+    public void onDemoButtonClick(View v) {
+        BleController.instance().sendData("DEMO$");
     }
 
     private void joinRoom() {
@@ -87,6 +100,8 @@ public class MainActivity extends Activity {
 
         if (!IS_CAMERA_CLIENT) {
             handler.postDelayed(repeatedTask, 2000);
+        } else {
+            mImageViewSmile.setVisibility(View.VISIBLE);
         }
     }
 
@@ -97,6 +112,7 @@ public class MainActivity extends Activity {
             CallView.instance().destroy();
         }
 
+        BleController.instance().disconnect();
         super.onStop();
     }
 
@@ -121,4 +137,11 @@ public class MainActivity extends Activity {
             handler.postDelayed(repeatedTask, 50);
         }
     };
+
+    public void onSmileClick(View v) {
+        mImageViewSmile.setRotation(mImageViewSmile.getRotation() * -1);
+
+        WindowManager.LayoutParams layoutParams = this.getWindow().getAttributes();
+        layoutParams.screenBrightness = 0.90f;
+    }
 }

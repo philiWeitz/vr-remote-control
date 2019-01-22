@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.CameraVideoCapturer;
@@ -60,6 +62,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import remote.vr.com.remote_android.serial.BleController;
+import remote.vr.com.remote_android.serial.HeadRotationModel;
 import remote.vr.com.remote_android.webrtc.AppRTCClient.SignalingParameters;
 
 /**
@@ -102,6 +106,8 @@ public class PeerConnectionClient {
   private static final int HD_VIDEO_WIDTH = 1280;
   private static final int HD_VIDEO_HEIGHT = 720;
   private static final int BPS_IN_KBPS = 1000;
+
+  private Gson mGson = new Gson();
 
   // Executor thread is started once in private ctor and is used for all
   // peer connection API calls to ensure new peer connection factory is
@@ -1313,9 +1319,14 @@ public class PeerConnectionClient {
     final byte[] bytes = new byte[data.capacity()];
     data.get(bytes);
     String strData = new String(bytes, Charset.forName("UTF-8"));
-    Log.v(TAG, "Received message over data channel: " + strData);
+    // Log.v(TAG, "Received message over data channel: " + strData);
 
     // TODO: add microcontroller serial communication here
+    try {
+      HeadRotationModel headRotation = mGson.fromJson(strData, HeadRotationModel.class);
+      // SerialController.instance().sendData(headRotation.toSerial());
+      BleController.instance().sendData(headRotation.toSerial());
+    } catch (Exception e) {}
   }
 
   // Implementation detail: handle offer creation/signaling and answer setting,
@@ -1332,7 +1343,7 @@ public class PeerConnectionClient {
         sdpDescription = preferCodec(sdpDescription, AUDIO_CODEC_ISAC, true);
       }
 
-      sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
+      sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, true);
 
       final SessionDescription sdp = new SessionDescription(origSdp.type, sdpDescription);
       localSdp = sdp;

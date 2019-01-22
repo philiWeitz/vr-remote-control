@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class RawImageWebRTC : MonoBehaviour
 {
+    // dimensions for Galaxy S7:
+    // left/right: 44.5
+    // top/bottom: 130
 
     public int INTERVAL_IN_MS = 1;
 
@@ -22,6 +25,11 @@ public class RawImageWebRTC : MonoBehaviour
     {
         SetupWebRtcCall();  
         RenderExternalArgbTexture();
+
+        Debug.LogError("xxxxx height: " + Screen.height);
+        Debug.LogError("xxxxx width: " + Screen.width);
+        Debug.LogError("xxxxx dpi: " + Screen.dpi);
+        Debug.LogError("xxxxx height: " + Screen.currentResolution);
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
@@ -46,6 +54,16 @@ public class RawImageWebRTC : MonoBehaviour
     void Update()
     {
         RenderExternalArgbTexture();
+    }
+
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (Application.platform == RuntimePlatform.Android && pause == true)
+        {
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+            plugin.CallStatic("closeWebRtcConnection");
+        }
     }
 
 

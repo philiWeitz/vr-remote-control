@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.util.UUID;
 
+import remote.vr.com.remote_android.serial.BleController;
 import remote.vr.com.remote_android.util.AsyncHttpURLConnection;
 import remote.vr.com.remote_android.webrtc.AppRTCClient;
 import remote.vr.com.remote_android.webrtc.PeerConnectionClient;
@@ -58,6 +59,8 @@ public class CallView {
 
     public void stop() {
         leaveLastRoom(mActivity);
+        //SerialController.instance().closeDriver();
+        BleController.instance().disconnect();
 
         if (mPeerConnectionClient != null) {
             mPeerConnectionClient.stopVideoSource();
@@ -131,6 +134,12 @@ public class CallView {
         this.mActivity = activity;
         this.mRoomId = roomId;
         this.mActivateCamera = activateCamera;
+
+        // if it is camera client => open USB connection
+        if(activateCamera) {
+            // SerialController.instance().openDriver(activity);
+            BleController.instance().openConnection(activity);
+        }
 
         // leave the previous room before starting a new connection
         leaveLastRoom(activity);
@@ -231,7 +240,7 @@ public class CallView {
                 false,
                 false,
                 32,
-                "OPUS",
+                "ISAC",
                 false,
                 false,
                 false,

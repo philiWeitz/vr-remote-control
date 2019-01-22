@@ -1,8 +1,10 @@
 package remote.vr.com.remote_android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
@@ -55,6 +57,16 @@ public class PluginClass {
                     layoutParams.screenBrightness = 0.99f;
                 }
                 mainActivity.getWindow().setAttributes(layoutParams);
+
+                if(activateCamera) {
+                    Log.d(TAG, "Enable speakers...");
+                    AudioManager audioManager = (AudioManager)
+                            mainActivity.getSystemService(Context.AUDIO_SERVICE);
+
+                    audioManager.setMode(AudioManager.MODE_IN_CALL);
+                    if (!audioManager.isSpeakerphoneOn())
+                        audioManager.setSpeakerphoneOn(true);
+                }
             }
         });
 

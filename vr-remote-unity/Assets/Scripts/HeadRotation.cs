@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define RASPBERRY_PI
+
+using System.Collections;
 using System;
 using UnityEngine;
 
@@ -12,15 +14,20 @@ public class HeadRotation
     public static HeadRotation fromVector3(Vector3 vector)
     {
         HeadRotation rotation = new HeadRotation();
+
+#if RASPBERRY_PI
         rotation.vertical = EulerToPWM(vector.x, -500);
         rotation.horizontal = EulerToPWM(vector.y);
-
-        // Debug.LogError("Hello " + rotation.vertical.ToString());
+#else
+        rotation.vertical = EulerToPWM(vector.x);
+        rotation.horizontal = EulerToPWM(vector.y);
+#endif
 
         return rotation;
     }
 
-    private static int EulerToPWM(float eulerAngle, int pwmOffset = 0) {
+    private static int EulerToPWM(float eulerAngle, int pwmOffset = 0)
+    {
         float value = 0;
 
         // map to 0 - 180 degree
@@ -33,9 +40,12 @@ public class HeadRotation
             value = Mathf.Min(180f, 90f + Math.Abs(eulerAngle - 360f));
         }
 
-        // map to 0 - 1800 + 500 offset
-        int pwmValue = (int) Mathf.Round((1800f * value) / 180f) + 500 + pwmOffset;
-
+        // Raspberry PI only: map to 0 - 1800 + 500 offset
+#if RASPBERRY_PI
+        int pwmValue = (int)Mathf.Round((1800f * value) / 180f) + 500 + pwmOffset;
         return Math.Min(2300, Math.Max(500, pwmValue));
+#else
+        return (int) value;
+#endif
     }
 }

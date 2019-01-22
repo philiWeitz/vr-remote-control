@@ -84,8 +84,10 @@ public class BleController {
             mActivity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-        mBleScanner = mBluetoothAdapter.getBluetoothLeScanner();
-        mBleScanner.startScan(mScanCallback);
+        if (mBleScanner != null) {
+            mBleScanner = mBluetoothAdapter.getBluetoothLeScanner();
+            mBleScanner.startScan(mScanCallback);
+        }
     }
 
 

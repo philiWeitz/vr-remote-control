@@ -14,6 +14,16 @@
         android:layout_height="match_parent"
         android:layout_margin="20dp" />
 
+    <ImageView
+        android:onClick="onSmileClick"
+        android:id="@+id/imageViewSmile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:rotation="-90"
+        android:src="@drawable/smile"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:id="@+id/main-activity-room-input-layout"
         android:layout_width="match_parent"
@@ -38,5 +48,12 @@
             android:layout_height="wrap_content"
             android:onClick="onJoinRoomButtonClick"
             android:text="Join Room" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="onDemoButtonClick"
+            android:text="Play Demo" />
     </LinearLayout>
 </RelativeLayout>

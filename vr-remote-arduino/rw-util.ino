@@ -12,9 +12,7 @@ char inputBuffer[INPUT_BUFFER_SIZE];
 /*
  * Example Serial commands:
  * 
- * - HORIZONTAL,100$
- * - HORIZONTAL,1020$
- * - VERTICAL,100$
+ * - HEAD,90,90$
  */
 
 void readInput() {
@@ -25,7 +23,7 @@ void readInput() {
     // input end character found -> execute command
     if(inputChar == INPUT_END_CHAR) {
       inputBuffer[inputBufferPtr] = '\0';
-      Serial.println(inputBuffer);
+      // Serial.println(inputBuffer);
       parseInputBuffer();
       resetBuffer();
       
@@ -49,10 +47,10 @@ void parseInputBuffer() {
   if(!subStr) {
     return;
   }
-  if (strcmp(subStr, "HORIZONTAL") == 0) {
-    parseHorizontal();
-  } else if (strcmp(subStr, "VERTICAL") == 0) {
-    parseVertical();
+  if (strcmp(subStr, "HEAD") == 0) {
+    parseHeadPosition();
+  } else if (strcmp(subStr, "DEMO") == 0) {
+    debugRotation();
   }
 }
 
@@ -63,30 +61,24 @@ void resetBuffer() {
 }
 
 
-void parseHorizontal() {
+void parseHeadPosition() {
   char* subStr = strtok (NULL, INPUT_DELIMITER);
   if(!subStr) { return; }
+  // we need to invert the direction because of the construction
+  uint32_t horizontalPwmValue = max(0, min(180, atoi(subStr)));
+  horizontalServo.write(horizontalPwmValue);
 
-  uint32_t pwmValue = min(1023, atoi(subStr));
-  horizontalServo.write(pwmValue);
+  subStr = strtok (NULL, INPUT_DELIMITER);
+  if(!subStr) { return; }
+  uint32_t verticalPwmValue = max(70, min(170, atoi(subStr) + 10));
+  verticalPwmValue = 180 - verticalPwmValue;
+  verticalServo.write(verticalPwmValue);
 
   #ifdef DEBUG
   Serial.print("Write PWM to horizontal servo: ");
-  Serial.println(pwmValue);
-  #endif
-}
-
-
-void parseVertical() {
-  char* subStr = strtok (NULL, INPUT_DELIMITER);
-  if(!subStr) { return; }
-
-  uint32_t pwmValue = min(1023, atoi(subStr));
-  verticalServo.write(pwmValue);
-
-  #ifdef DEBUG
+  Serial.println(horizontalPwmValue);
   Serial.print("Write PWM to vertical servo: ");
-  Serial.println(pwmValue);
+  Serial.println(verticalPwmValue);
   #endif
 }
 

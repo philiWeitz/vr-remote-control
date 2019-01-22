@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
+using UnityEngine.XR;
 using UnityEngine.UI;
 
 public class JoinRoomInputField : MonoBehaviour {
 
-    private InputField input;
+    public InputField input;
 
     // Use this for initialization
     void Start () {
-        input = this.GetComponent<InputField>();
         input.text = PlayerPrefs.GetString("roomId");
         input.keyboardType = TouchScreenKeyboardType.Default;
+
+        // Disable VR for input
+        XRSettings.enabled = false;
     }
 
     public void ChangeScene() {
@@ -19,11 +22,9 @@ public class JoinRoomInputField : MonoBehaviour {
             roomId = "autoRoom1";
         }
 
+        XRSettings.enabled = true;
         PlayerPrefs.SetString("roomId", roomId);
         UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
 
-    public void FocusInputField() {
-        input.ActivateInputField();
-    }
 }
