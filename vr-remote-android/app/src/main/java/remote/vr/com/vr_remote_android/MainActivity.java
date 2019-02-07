@@ -141,7 +141,7 @@ public class MainActivity extends Activity {
     public void onSmileClick(View v) {
         mImageViewSmile.setRotation(mImageViewSmile.getRotation() * -1);
 
-        WindowManager.LayoutParams layoutParams = this.getWindow().getAttributes();
+        WindowManager.LayoutParams layoutParams = MainActivity.this.getWindow().getAttributes();
         layoutParams.screenBrightness = 0.90f;
     }
 }

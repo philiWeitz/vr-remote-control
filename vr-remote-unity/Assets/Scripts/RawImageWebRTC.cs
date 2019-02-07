@@ -9,8 +9,6 @@ public class RawImageWebRTC : MonoBehaviour
     // left/right: 44.5
     // top/bottom: 130
 
-    public int INTERVAL_IN_MS = 1;
-
     public String RoomId = "";
 
 
@@ -26,10 +24,10 @@ public class RawImageWebRTC : MonoBehaviour
         SetupWebRtcCall();  
         RenderExternalArgbTexture();
 
-        Debug.LogError("xxxxx height: " + Screen.height);
-        Debug.LogError("xxxxx width: " + Screen.width);
-        Debug.LogError("xxxxx dpi: " + Screen.dpi);
-        Debug.LogError("xxxxx height: " + Screen.currentResolution);
+        Debug.Log("Screen height: " + Screen.height);
+        Debug.Log("Screen width: " + Screen.width);
+        Debug.Log("Screen dpi: " + Screen.dpi);
+        Debug.Log("Screen height: " + Screen.currentResolution);
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
@@ -121,7 +119,7 @@ public class RawImageWebRTC : MonoBehaviour
 
         if (timeLastExecution < now)
         {
-            timeLastExecution = now + INTERVAL_IN_MS;
+            timeLastExecution = now + Config.config.externalTextureUpdateInterval;
 
             AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
             AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getArgbTextureResult");

@@ -415,7 +415,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36908bb448f054df89c30d31e9f6d20e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  INTERVAL_IN_MS: 50
+  INTERVAL_IN_MS: 100
   MAX_ANGLE_DIFFERENCE: 0.2
 --- !u!1 &756175429
 GameObject:

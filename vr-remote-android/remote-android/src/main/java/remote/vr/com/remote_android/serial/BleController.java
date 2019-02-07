@@ -66,6 +66,7 @@ public class BleController {
         mBleGatt = null;
         mDevice = null;
         mBleScanner = null;
+        mCharacteristic = null;
     }
 
     public void openConnection(Activity activity) {
@@ -84,9 +85,17 @@ public class BleController {
             mActivity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-        if (mBleScanner != null) {
+        if (mBluetoothAdapter != null) {
             mBleScanner = mBluetoothAdapter.getBluetoothLeScanner();
             mBleScanner.startScan(mScanCallback);
+
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity,"Start scanning...", Toast.LENGTH_SHORT).show();
+                    writeDebugMovementToBle();
+                }
+            });
         }
     }
 

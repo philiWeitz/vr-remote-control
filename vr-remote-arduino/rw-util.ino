@@ -13,6 +13,8 @@ char inputBuffer[INPUT_BUFFER_SIZE];
  * Example Serial commands:
  * 
  * - HEAD,90,90$
+ * - CAR,100,-100$
+ * - CAR,-23,-73$
  */
 
 void readInput() {
@@ -49,6 +51,8 @@ void parseInputBuffer() {
   }
   if (strcmp(subStr, "HEAD") == 0) {
     parseHeadPosition();
+  } else if (strcmp(subStr, "CAR") == 0) {
+    parseCarMotorSpeed();
   } else if (strcmp(subStr, "DEMO") == 0) {
     debugRotation();
   }
@@ -66,10 +70,12 @@ void parseHeadPosition() {
   if(!subStr) { return; }
   // we need to invert the direction because of the construction
   uint32_t horizontalPwmValue = max(0, min(180, atoi(subStr)));
+  horizontalPwmValue = 180 - horizontalPwmValue;
   horizontalServo.write(horizontalPwmValue);
 
   subStr = strtok (NULL, INPUT_DELIMITER);
   if(!subStr) { return; }
+  // we need to invert the direction because of the construction
   uint32_t verticalPwmValue = max(70, min(170, atoi(subStr) + 10));
   verticalPwmValue = 180 - verticalPwmValue;
   verticalServo.write(verticalPwmValue);
@@ -80,5 +86,22 @@ void parseHeadPosition() {
   Serial.print("Write PWM to vertical servo: ");
   Serial.println(verticalPwmValue);
   #endif
+}
+
+void parseCarMotorSpeed() {
+  // inut values ranges from -100% to 100%
+  char* subStr = strtok (NULL, INPUT_DELIMITER);
+  if(!subStr) { return; }
+  int leftSpeed = atoi(subStr);
+
+  subStr = strtok (NULL, INPUT_DELIMITER);
+  if(!subStr) { return; }
+  int rightSpeed = atoi(subStr);
+
+  printlnDebug("Setting motor speed for left side");
+  setMotorSpeed(MOTOR_LEFT_FORWARD_PWM, MOTOR_LEFT_BACKWARDS_PWM, leftSpeed);
+
+  printlnDebug("Setting motor speed for right side");
+  setMotorSpeed(MOTOR_RIGHT_FORWARD_PWM, MOTOR_RIGHT_BACKWARDS_PWM, rightSpeed);
 }
 

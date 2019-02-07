@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class SendHeadRotation : MonoBehaviour
 {
-    public int INTERVAL_IN_MS = 50;
-
-    public float MAX_ANGLE_DIFFERENCE = 1;
-
     private double timeLastExecution = 0;
 
-    private Vector3 lastHeadPosition = new Vector3(100,100,100);
+    private Vector3 lastHeadPosition = new Vector3(100, 100, 100);
 
 
     // Use this for initialization
@@ -39,7 +35,8 @@ public class SendHeadRotation : MonoBehaviour
     }
 
 
-    void ConnectToMotionServer() {
+    void ConnectToMotionServer()
+    {
         AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
 
         plugin.CallStatic("setWebSocketUrl", Config.WEB_SOCKET_SERVER_URL);
@@ -47,11 +44,16 @@ public class SendHeadRotation : MonoBehaviour
     }
 
 
-    bool HeadPositionHasChanged(Vector3 currentHeadPosition) {
+    bool HeadPositionHasChanged(Vector3 currentHeadPosition)
+    {
         Vector3 sub = currentHeadPosition - lastHeadPosition;
-        float sum = Mathf.Abs(sub.x) + Mathf.Abs(sub.y) + Mathf.Abs(sub.z);
 
-        return (sum >= MAX_ANGLE_DIFFERENCE);
+        return Mathf.Abs(sub.x) > Config.config.headRotationMinAngle ||
+            Mathf.Abs(sub.y) > Config.config.headRotationMinAngle ||
+            Mathf.Abs(sub.z) > Config.config.headRotationMinAngle;
+
+        //float sum = Mathf.Abs(sub.x) + Mathf.Abs(sub.y) + Mathf.Abs(sub.z);
+        //return (sum >= Config.config.headRotationMinAngle);
     }
 
 
@@ -66,7 +68,7 @@ public class SendHeadRotation : MonoBehaviour
 
         if (timeLastExecution < now)
         {
-            timeLastExecution = now + INTERVAL_IN_MS;
+            timeLastExecution = now + Config.config.sendHeadRotationInterval;
 
             // get camera rotation
             Vector3 currentHeadPosition = Camera.main.gameObject.transform.rotation.eulerAngles;
@@ -90,12 +92,13 @@ public class SendHeadRotation : MonoBehaviour
 
         if (timeLastExecution < now)
         {
-            timeLastExecution = now + INTERVAL_IN_MS;
+            timeLastExecution = now + Config.config.sendHeadRotationInterval;
 
             // get camera rotation
             Vector3 currentHeadPosition = Camera.main.gameObject.transform.rotation.eulerAngles;
 
-            if(HeadPositionHasChanged(currentHeadPosition)) {
+            if (HeadPositionHasChanged(currentHeadPosition))
+            {
                 lastHeadPosition = currentHeadPosition;
                 string json = JsonUtility.ToJson(HeadRotation.fromVector3(currentHeadPosition));
                 Debug.Log(json);
