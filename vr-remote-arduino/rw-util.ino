@@ -13,6 +13,7 @@ char inputBuffer[INPUT_BUFFER_SIZE];
  * Example Serial commands:
  * 
  * - HEAD,90,90$
+ * - CAR,0,-0$
  * - CAR,100,-100$
  * - CAR,-23,-73$
  */
@@ -76,7 +77,7 @@ void parseHeadPosition() {
   subStr = strtok (NULL, INPUT_DELIMITER);
   if(!subStr) { return; }
   // we need to invert the direction because of the construction
-  uint32_t verticalPwmValue = max(70, min(170, atoi(subStr) + 10));
+  uint32_t verticalPwmValue = max(40, min(170, atoi(subStr) + 10));
   verticalPwmValue = 180 - verticalPwmValue;
   verticalServo.write(verticalPwmValue);
 
@@ -97,11 +98,8 @@ void parseCarMotorSpeed() {
   subStr = strtok (NULL, INPUT_DELIMITER);
   if(!subStr) { return; }
   int rightSpeed = atoi(subStr);
-
-  printlnDebug("Setting motor speed for left side");
-  setMotorSpeed(MOTOR_LEFT_FORWARD_PWM, MOTOR_LEFT_BACKWARDS_PWM, leftSpeed);
-
-  printlnDebug("Setting motor speed for right side");
-  setMotorSpeed(MOTOR_RIGHT_FORWARD_PWM, MOTOR_RIGHT_BACKWARDS_PWM, rightSpeed);
+  
+  setMotorSpeed(MOTOR_LEFT_FORWARD, MOTOR_LEFT_BACKWARDS, leftSpeed, true);
+  setMotorSpeed(MOTOR_RIGHT_FORWARD, MOTOR_RIGHT_BACKWARDS, rightSpeed, false);
 }
 

@@ -120,28 +120,37 @@ public class RawImageWebRTC : MonoBehaviour
         if (timeLastExecution < now)
         {
             timeLastExecution = now + Config.config.externalTextureUpdateInterval;
-
-            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
-            AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getArgbTextureResult");
-
-            Int32 texPtr = returnedObject.Get<Int32>("texturePtr");
-            Int32 width = returnedObject.Get<Int32>("width");
-            Int32 height = returnedObject.Get<Int32>("height");
-
-            if (width <= 0 || height <= 0 || texPtr <= 0)
-            {
-                return;
-            }
-
-            if (null == nativeTexture || nativeTexture.width != width || nativeTexture.height != height)
-            {
-                nativeTexture = Texture2D.CreateExternalTexture(
-                    width, height, TextureFormat.ARGB32, false, false, (IntPtr)texPtr);
-                nativeTexture.filterMode = FilterMode.Point;
-            }
-
-            this.GetComponent<RawImage>().texture = nativeTexture;
-            nativeTexture.UpdateExternalTexture((IntPtr)texPtr);
+            RenderTexture();
         }
+    }
+
+
+    void RenderTexture() {
+        AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+        AndroidJavaObject returnedObject = plugin.CallStatic<AndroidJavaObject>("getArgbTextureResult");
+
+        Int32 texPtr = returnedObject.Get<Int32>("texturePtr");
+        Int32 width = returnedObject.Get<Int32>("width");
+        Int32 height = returnedObject.Get<Int32>("height");
+
+        if (width <= 0 || height <= 0 || texPtr <= 0)
+        {
+            return;
+        }
+
+        if (null == nativeTexture || nativeTexture.width != width || nativeTexture.height != height)
+        {
+            nativeTexture = Texture2D.CreateExternalTexture(
+                width, height, TextureFormat.ARGB32, false, false, (IntPtr)texPtr);
+            nativeTexture.filterMode = FilterMode.Point;
+        }
+
+        this.GetComponent<RawImage>().texture = nativeTexture;
+        nativeTexture.UpdateExternalTexture((IntPtr)texPtr);
+    }
+
+
+    void NewFrameReceived(string key) {
+        // RenderTexture();
     }
 }

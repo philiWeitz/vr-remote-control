@@ -60,7 +60,7 @@ public class CallView {
     public void stop() {
         leaveLastRoom(mActivity);
         //SerialController.instance().closeDriver();
-        BleController.instance().disconnect();
+        //BleController.instance().disconnect();
 
         if (mPeerConnectionClient != null) {
             mPeerConnectionClient.stopVideoSource();

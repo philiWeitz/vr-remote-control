@@ -1,5 +1,6 @@
 package remote.vr.com.remote_android.main;
 
+import com.unity3d.player.*;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -93,6 +94,8 @@ public class FrameCallback {
 
         if(RENDER_ARGB) {
             mYuvFrame = new YuvFrame(frame);
+            // should update the external texture directly without polling
+            // UnityPlayer.UnitySendMessage("RawWebRtcImage", "NewFrameReceived", "ahhhhh");
 
         } else {
             ByteBuffer yBuffer = frame.yuvPlanes[0];

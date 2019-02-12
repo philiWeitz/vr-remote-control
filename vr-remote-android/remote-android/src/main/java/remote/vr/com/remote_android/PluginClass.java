@@ -52,7 +52,7 @@ public class PluginClass {
                 WindowManager.LayoutParams layoutParams = mainActivity.getWindow().getAttributes();
 
                 if(activateCamera) {
-                    layoutParams.screenBrightness = 0.01f;
+                    // layoutParams.screenBrightness = 0.50f;
                 } else {
                     layoutParams.screenBrightness = 0.99f;
                 }

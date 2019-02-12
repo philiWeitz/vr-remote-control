@@ -127,6 +127,8 @@ public class BleController {
                     public void run() {
                         Toast.makeText(mActivity,
                                 "BLE Disconnected", Toast.LENGTH_LONG).show();
+
+                        BleController.instance().openConnection(mActivity);
                     }
                 });
             }
