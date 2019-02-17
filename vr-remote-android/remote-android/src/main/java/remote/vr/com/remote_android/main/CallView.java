@@ -153,7 +153,7 @@ public class CallView {
         viewGroup.addView(textView);
         viewGroup.addView(mResolutionTextView);
 
-        textView.getLayoutParams().width = 300;
+        textView.getLayoutParams().width = 550;
         textView.getLayoutParams().height = 100;
         textView.setTextColor(Color.GREEN);
 
@@ -162,7 +162,7 @@ public class CallView {
         mResolutionTextView.setTextColor(Color.GREEN);
 
         if(mResolutionTextView.getLayoutParams() instanceof FrameLayout.LayoutParams) {
-            ((FrameLayout.LayoutParams) mResolutionTextView.getLayoutParams()).leftMargin = 400;
+            ((FrameLayout.LayoutParams) mResolutionTextView.getLayoutParams()).leftMargin = 600;
         } else if(mResolutionTextView.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
             ((RelativeLayout.LayoutParams) mResolutionTextView.getLayoutParams()).leftMargin = 400;
         }

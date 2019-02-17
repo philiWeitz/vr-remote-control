@@ -52,10 +52,17 @@ public class GearVrInput : MonoBehaviour {
     }
 
     public string GetCarControl() {
-        if(Input.GetAxis("Oculus_GearVR_DpadX") > 0.9) {
+        float dpadX = Input.GetAxis("Oculus_GearVR_DpadX");
+        float dpadY = Input.GetAxis("Oculus_GearVR_DpadY");
+
+        if (dpadX >= 0.9) {
             return "FORWARD";
-        } else if(Input.GetAxis("Oculus_GearVR_DpadY") > 0.9) {
+        } else if (dpadX <= 0.1 && dpadX > 0) {
             return "BACKWARDS";
+        } else if (dpadY >= 0.9) {
+            return "LEFT";
+        } else if (dpadY <= 0.1 && dpadY > 0) {
+            return "RIGHT";
         }
         return "STOP";
     }
@@ -77,7 +84,8 @@ public class GearVrInput : MonoBehaviour {
         text += "Touch Position: " + touchPosition.x;
         text += "Any button down: " + Input.anyKey.ToString() + "\n";
         text += "Mouse button down: " + Input.GetMouseButtonDown(0).ToString() + '\n';
-        text += "Mouse button back: " + Input.GetMouseButtonDown(1).ToString();
+        text += "Mouse button back: " + Input.GetMouseButtonDown(1).ToString() + '\n';
+        text += "Car control: " + GetCarControl();
         TextField.text = text;
     }
 }
