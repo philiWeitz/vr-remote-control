@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SendHeadRotation : MonoBehaviour
 {
+    public Camera CameraObject;
     private double timeLastExecution = 0;
 
     private Vector3 lastHeadPosition = new Vector3(100, 100, 100);
@@ -12,6 +13,9 @@ public class SendHeadRotation : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        if (CameraObject == null) {
+            CameraObject = Camera.main;
+        }
         ConnectToMotionServer();
     }
 
@@ -95,7 +99,7 @@ public class SendHeadRotation : MonoBehaviour
             timeLastExecution = now + Config.config.sendHeadRotationInterval;
 
             // get camera rotation
-            Vector3 currentHeadPosition = Camera.main.gameObject.transform.rotation.eulerAngles;
+            Vector3 currentHeadPosition = CameraObject.gameObject.transform.rotation.eulerAngles;
 
             if (HeadPositionHasChanged(currentHeadPosition))
             {

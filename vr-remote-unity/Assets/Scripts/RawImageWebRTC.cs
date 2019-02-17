@@ -11,6 +11,7 @@ public class RawImageWebRTC : MonoBehaviour
 
     public String RoomId = "";
 
+    public RawImage rawImg;
 
     private double timeLastExecution = 0;
 
@@ -21,6 +22,10 @@ public class RawImageWebRTC : MonoBehaviour
     
     void Start()
     {
+        if (rawImg == null) {
+            rawImg = this.GetComponent<RawImage>();
+        }
+
         SetupWebRtcCall();  
         RenderExternalArgbTexture();
 
@@ -69,9 +74,8 @@ public class RawImageWebRTC : MonoBehaviour
     {
         Debug.Log("Flipping vertically");
 
-        RawImage img = this.GetComponent<RawImage>();
-        Rect rect = new Rect(0, 0, img.uvRect.width * -1, img.uvRect.height);
-        img.uvRect = rect;
+        Rect rect = new Rect(0, 0, rawImg.uvRect.width * -1, rawImg.uvRect.height);
+        rawImg.uvRect = rect;
 
         isFlippedHorizontally = false;
     }
@@ -81,9 +85,8 @@ public class RawImageWebRTC : MonoBehaviour
     {
         Debug.Log("Flipping horizontally");
 
-        RawImage img = this.GetComponent<RawImage>();
-        Rect rect = new Rect(0, 0, img.uvRect.width, img.uvRect.height * -1);
-        img.uvRect = rect;
+        Rect rect = new Rect(0, 0, rawImg.uvRect.width, rawImg.uvRect.height * -1);
+        rawImg.uvRect = rect;
 
         isFlippedHorizontally = true;
     }
@@ -145,7 +148,7 @@ public class RawImageWebRTC : MonoBehaviour
             nativeTexture.filterMode = FilterMode.Point;
         }
 
-        this.GetComponent<RawImage>().texture = nativeTexture;
+        rawImg.texture = nativeTexture;
         nativeTexture.UpdateExternalTexture((IntPtr)texPtr);
     }
 

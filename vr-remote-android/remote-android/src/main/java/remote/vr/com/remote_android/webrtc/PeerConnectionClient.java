@@ -63,6 +63,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import remote.vr.com.remote_android.serial.BleController;
+import remote.vr.com.remote_android.serial.CarControlModel;
 import remote.vr.com.remote_android.serial.HeadRotationModel;
 import remote.vr.com.remote_android.webrtc.AppRTCClient.SignalingParameters;
 
@@ -1321,12 +1322,27 @@ public class PeerConnectionClient {
     String strData = new String(bytes, Charset.forName("UTF-8"));
     // Log.v(TAG, "Received message over data channel: " + strData);
 
-    // TODO: add microcontroller serial communication here
+    if(!sendHeadRotationModel(strData)) {
+      sendCarControlModel(strData);
+    }
+  }
+
+  private boolean sendHeadRotationModel(String data) {
     try {
-      HeadRotationModel headRotation = mGson.fromJson(strData, HeadRotationModel.class);
-      // SerialController.instance().sendData(headRotation.toSerial());
+      HeadRotationModel headRotation = mGson.fromJson(data, HeadRotationModel.class);
       BleController.instance().sendData(headRotation.toSerial());
-    } catch (Exception e) {}
+      return true;
+    } catch (Exception e) { }
+    return false;
+  }
+
+  private boolean sendCarControlModel(String data) {
+    try {
+      CarControlModel carControl = mGson.fromJson(data, CarControlModel.class);
+      BleController.instance().sendData(carControl.toSerial());
+      return true;
+    } catch (Exception e) { }
+    return false;
   }
 
   // Implementation detail: handle offer creation/signaling and answer setting,
