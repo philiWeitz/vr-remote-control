@@ -24,7 +24,7 @@ public class JoinRoomInputField : MonoBehaviour {
 
         XRSettings.enabled = true;
         PlayerPrefs.SetString("roomId", roomId);
-        UnityEngine.SceneManagement.SceneManager.LoadScene(2);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
 
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,17 +8,32 @@ public class Keyboard : MonoBehaviour
 
     public InputField RoomInputField;
 
+    private double timeLastExecution = 0;
 
     public void OnRoomInputFieldClick() {
-        Debug.Log("'" + Character + "' was clicked");
-        RoomInputField.text = RoomInputField.text + Character;
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+        if (timeLastExecution < now)
+        {
+            timeLastExecution = now + 200;
+
+            Debug.Log("'" + Character + "' was clicked");
+            RoomInputField.text = RoomInputField.text + Character;
+        }
     }
 
     public void OnDeleteClick() {
-        if (RoomInputField.text.Length > 0)
+        double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+        if (timeLastExecution < now)
         {
-            RoomInputField.text =
-                RoomInputField.text.Remove(RoomInputField.text.Length - 1, 1);
+            timeLastExecution = now + 200;
+
+            if (RoomInputField.text.Length > 0)
+            {
+                RoomInputField.text =
+                    RoomInputField.text.Remove(RoomInputField.text.Length - 1, 1);
+            }
         }
     }
 

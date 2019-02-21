@@ -9,6 +9,7 @@ public class SendHeadRotation : MonoBehaviour
 
     private Vector3 lastHeadPosition = new Vector3(100, 100, 100);
 
+    private bool drivingModeActive = false;
 
     // Use this for initialization
     void Start()
@@ -70,7 +71,20 @@ public class SendHeadRotation : MonoBehaviour
 
         double now = (DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-        if (timeLastExecution < now)
+        if (Input.anyKey && !drivingModeActive) {
+            drivingModeActive = true;
+
+            string json = JsonUtility.ToJson(HeadRotation.centered());
+
+            AndroidJavaClass plugin = new AndroidJavaClass(Config.pluginClassString);
+            plugin.CallStatic("sendMessageToMotionWebSocket", json);
+
+        } else if (!Input.anyKey && drivingModeActive) {
+            drivingModeActive = false;
+        }
+
+
+        if (timeLastExecution < now && !drivingModeActive)
         {
             timeLastExecution = now + Config.config.sendHeadRotationInterval;
 

@@ -103,6 +103,9 @@ public class PluginClass {
         //MotionWebSocketClient.instance().sendMessage(message);
     }
 
+    public static void sendCarControlMessage(String message) {
+        CallView.instance().sendMessage(message);
+    }
 
     public static void setWebSocketUrl(String url) {
         //MotionWebSocketClient.instance().setWebSocketUrl(url);

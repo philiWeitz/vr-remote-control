@@ -1322,8 +1322,10 @@ public class PeerConnectionClient {
     String strData = new String(bytes, Charset.forName("UTF-8"));
     // Log.v(TAG, "Received message over data channel: " + strData);
 
-    if(!sendHeadRotationModel(strData)) {
+    if (strData.contains("left")) {
       sendCarControlModel(strData);
+    } else {
+      sendHeadRotationModel(strData);
     }
   }
 

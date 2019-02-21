@@ -11,6 +11,16 @@ public class HeadRotation
     public int vertical;
     public int horizontal;
 
+    public static HeadRotation centered()
+    {
+        HeadRotation rotation = new HeadRotation();
+
+        rotation.vertical = EulerToPWM(0);
+        rotation.horizontal = EulerToPWM(0);
+
+        return rotation;
+    }
+
     public static HeadRotation fromVector3(Vector3 vector)
     {
         HeadRotation rotation = new HeadRotation();
